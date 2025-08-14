@@ -140,6 +140,15 @@ export const storage: StorageInterface = {
 
     saveState(newState);
     cachedState = newState;
+
+    // Trigger storage event for other tabs and force refresh
+    window.dispatchEvent(
+      new StorageEvent("storage", {
+        key: LOCAL_STORAGE_KEY,
+        newValue: JSON.stringify(newState),
+        oldValue: JSON.stringify(currentState),
+      })
+    );
   },
 
   update<K extends keyof TAppState>(
@@ -152,6 +161,15 @@ export const storage: StorageInterface = {
 
     saveState(newState);
     cachedState = newState;
+
+    // Trigger storage event for other tabs and force refresh
+    window.dispatchEvent(
+      new StorageEvent("storage", {
+        key: LOCAL_STORAGE_KEY,
+        newValue: JSON.stringify(newState),
+        oldValue: JSON.stringify(currentState),
+      })
+    );
   },
 
   clearStorage(): void {

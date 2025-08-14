@@ -1,244 +1,298 @@
-import { useState } from "react";
-import { ChevronDown, ChevronRight, PlayCircle, Clock, Trash2 } from "lucide-react";
-import toast from "react-hot-toast";
-import PlaylistManager from "../components/PlaylistManager";
-import VideoList from "../components/VideoList";
-import VideoFilters, { type CompletionFilter, type SortOption } from "../components/VideoFilters";
+import { BarChart3, Clock, TrendingUp, PlayCircle, Target, Award, Flame, BookOpen } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../components/ui/collapsible";
-import { usePlaylists, useVideos, useProgress } from "../hooks/useLocalStorage";
+import { Progress } from "../components/ui/progress";
+import { usePlaylists, useVideos, useProgress, useNotes } from "../hooks/useLocalStorage";
 
-interface PlaylistCardProps {
-    playlist: {
-        id: string;
-        title: string;
-        channelTitle: string;
-        itemCount: number;
-        importedAt: string;
-    };
-    onVideoSelect?: (videoId: string) => void;
-}
+// Analytics helper functions
+function getStreakDays(progress: Record<string, any>) {
+    // Simple streak calculation - days with any watch activity
+    const dates = Object.values(progress)
+        .map(p => p.lastWatchedAt)
+        .filter(Boolean)
+        .map(date => new Date(date).toDateString());
 
-function PlaylistCard({ playlist, onVideoSelect }: PlaylistCardProps) {
-    const [isExpanded, setIsExpanded] = useState(false);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [completionFilter, setCompletionFilter] = useState<CompletionFilter>("all");
-    const [sortBy, setSortBy] = useState<SortOption>("position");
+    const uniqueDates = [...new Set(dates)].sort();
+    let streak = 0;
+    // const today = new Date().toDateString(); // unused for now
 
-    const { getVideosByPlaylist } = useVideos();
-    const { getVideoProgress } = useProgress();
-    const { removePlaylist } = usePlaylists();
-
-    const videos = getVideosByPlaylist(playlist.id);
-
-    // Calculate playlist stats
-    const playlistStats = videos.reduce(
-        (acc, video) => {
-            const progress = getVideoProgress(video.id);
-            const isCompleted = progress.completion >= 0.9;
-            const hasStarted = progress.watchedSeconds > 0;
-
-            acc.totalDuration += video.durationSec;
-            acc.totalWatchedTime += progress.watchedSeconds;
-
-            if (isCompleted) {
-                acc.completed++;
-            } else if (hasStarted) {
-                acc.inProgress++;
-            } else {
-                acc.notStarted++;
-            }
-
-            return acc;
-        },
-        { completed: 0, inProgress: 0, notStarted: 0, totalDuration: 0, totalWatchedTime: 0 }
-    );
-
-    const completionRate = videos.length > 0 ? (playlistStats.completed / videos.length) * 100 : 0;
-
-    // Filter videos for current filters
-    const filteredVideos = videos.filter(video => {
-        const matchesSearch = !searchQuery ||
-            video.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            video.channelTitle.toLowerCase().includes(searchQuery.toLowerCase());
-
-        if (!matchesSearch) return false;
-
-        if (completionFilter === "all") return true;
-
-        const progress = getVideoProgress(video.id);
-        const isCompleted = progress.completion >= 0.9;
-        const hasStarted = progress.watchedSeconds > 0;
-
-        switch (completionFilter) {
-            case "completed": return isCompleted;
-            case "in-progress": return hasStarted && !isCompleted;
-            case "not-started": return !hasStarted;
-            default: return true;
+    // Count consecutive days from today backwards
+    for (let i = 0; i < uniqueDates.length; i++) {
+        const currentDate = new Date();
+        currentDate.setDate(currentDate.getDate() - i);
+        if (uniqueDates.includes(currentDate.toDateString())) {
+            streak++;
+        } else {
+            break;
         }
-    });
+    }
 
-    const formatDuration = (seconds: number) => {
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        if (hours > 0) {
-            return `${hours}h ${minutes}m`;
-        }
-        return `${minutes}m`;
-    };
-
-    const handleDelete = () => {
-        if (window.confirm(`Are you sure you want to delete "${playlist.title}"? This will also remove all progress and notes for videos in this playlist.`)) {
-            removePlaylist(playlist.id);
-            toast.success(`Deleted playlist "${playlist.title}"`);
-        }
-    };
-
-    return (
-        <Card>
-            <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
-                <CardHeader className="pb-4">
-                    <div className="flex items-center justify-between">
-                        <div className="space-y-1 flex-1 min-w-0">
-                            <CardTitle className="text-lg line-clamp-2">{playlist.title}</CardTitle>
-                            <CardDescription className="flex items-center gap-2 text-sm">
-                                <span>{playlist.channelTitle}</span>
-                                <span>•</span>
-                                <span>{videos.length} videos</span>
-                                <span>•</span>
-                                <span>{formatDuration(playlistStats.totalDuration)}</span>
-                            </CardDescription>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={handleDelete}
-                                className="text-muted-foreground hover:text-destructive"
-                            >
-                                <Trash2 className="w-4 h-4" />
-                            </Button>
-                            <CollapsibleTrigger asChild>
-                                <Button variant="ghost" size="sm">
-                                    {isExpanded ? (
-                                        <ChevronDown className="w-4 h-4" />
-                                    ) : (
-                                        <ChevronRight className="w-4 h-4" />
-                                    )}
-                                </Button>
-                            </CollapsibleTrigger>
-                        </div>
-                    </div>
-
-                    {/* Stats */}
-                    <div className="flex flex-wrap gap-2 mt-3">
-                        <Badge variant="secondary" className="text-xs">
-                            {Math.round(completionRate)}% Complete
-                        </Badge>
-                        {playlistStats.completed > 0 && (
-                            <Badge variant="default" className="text-xs">
-                                {playlistStats.completed} Completed
-                            </Badge>
-                        )}
-                        {playlistStats.inProgress > 0 && (
-                            <Badge variant="secondary" className="text-xs">
-                                {playlistStats.inProgress} In Progress
-                            </Badge>
-                        )}
-                        {playlistStats.notStarted > 0 && (
-                            <Badge variant="outline" className="text-xs">
-                                {playlistStats.notStarted} Not Started
-                            </Badge>
-                        )}
-                    </div>
-                </CardHeader>
-
-                <CollapsibleContent>
-                    <CardContent className="pt-0">
-                        <div className="space-y-4">
-                            <VideoFilters
-                                searchQuery={searchQuery}
-                                onSearchChange={setSearchQuery}
-                                completionFilter={completionFilter}
-                                onCompletionFilterChange={setCompletionFilter}
-                                sortBy={sortBy}
-                                onSortChange={setSortBy}
-                                videoCount={videos.length}
-                                filteredCount={filteredVideos.length}
-                            />
-
-                            <VideoList
-                                playlistId={playlist.id}
-                                searchQuery={searchQuery}
-                                completionFilter={completionFilter}
-                                sortBy={sortBy}
-                                onVideoSelect={onVideoSelect}
-                            />
-                        </div>
-                    </CardContent>
-                </CollapsibleContent>
-            </Collapsible>
-        </Card>
-    );
+    return streak;
 }
 
 export default function Playlists() {
     const { playlists } = usePlaylists();
+    const { videos, getVideosByPlaylist } = useVideos();
+    const { progress, getVideoProgress } = useProgress();
+    const { notes } = useNotes();
 
     const playlistsArray = Object.values(playlists).sort(
         (a, b) => new Date(b.importedAt).getTime() - new Date(a.importedAt).getTime()
     );
 
-    const handleVideoSelect = (videoId: string) => {
-        // TODO: Navigate to video player
-        console.log("Selected video:", videoId);
+    // Calculate comprehensive analytics
+    const totalVideos = Object.keys(videos).length;
+    const completedVideos = Object.values(progress).filter(p => p.completion >= 0.9).length;
+    const inProgressVideos = Object.values(progress).filter(p => p.watchedSeconds > 0 && p.completion < 0.9).length;
+    const totalWatchTime = Object.values(progress).reduce((sum, p) => sum + p.watchedSeconds, 0);
+    const totalNotes = Object.keys(notes).length;
+    const streakDays = getStreakDays(progress);
+
+    const formatWatchTime = (seconds: number) => {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        if (hours > 0) {
+            return `${hours}h ${minutes}m`;
+        } else if (minutes > 0) {
+            return `${minutes}m`;
+        }
+        return `${seconds}s`;
     };
 
+    const completionRate = totalVideos > 0 ? (completedVideos / totalVideos) * 100 : 0;
+
+    // Playlist analytics
+    const playlistAnalytics = playlistsArray.map(playlist => {
+        const playlistVideos = getVideosByPlaylist(playlist.id);
+        const playlistCompleted = playlistVideos.filter(v => {
+            const prog = getVideoProgress(v.id);
+            return prog.completion >= 0.9;
+        }).length;
+        const playlistWatchTime = playlistVideos.reduce((sum, v) => {
+            const prog = getVideoProgress(v.id);
+            return sum + prog.watchedSeconds;
+        }, 0);
+        const playlistTotalDuration = playlistVideos.reduce((sum, v) => sum + v.durationSec, 0);
+
+        return {
+            ...playlist,
+            videoCount: playlistVideos.length,
+            completedCount: playlistCompleted,
+            completionRate: playlistVideos.length > 0 ? (playlistCompleted / playlistVideos.length) * 100 : 0,
+            watchTime: playlistWatchTime,
+            totalDuration: playlistTotalDuration,
+        };
+    });
+
+    if (playlistsArray.length === 0) {
+        return (
+            <div className="container mx-auto py-8">
+                <div className="mb-8">
+                    <h1 className="text-4xl font-bold tracking-tight mb-2">Learning Analytics</h1>
+                    <p className="text-lg text-muted-foreground">
+                        Track your progress and insights
+                    </p>
+                </div>
+
+                <div className="text-center py-12 text-muted-foreground">
+                    <BarChart3 className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                    <h3 className="text-xl font-semibold mb-2">No Data Yet</h3>
+                    <p className="mb-6">
+                        Import some playlists and start learning to see your analytics!
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="container mx-auto py-8">
+        <div className="container mx-auto py-8 space-y-8">
             <div className="mb-8">
-                <h1 className="text-4xl font-bold tracking-tight mb-2">Playlists</h1>
+                <h1 className="text-4xl font-bold tracking-tight mb-2">Learning Analytics</h1>
                 <p className="text-lg text-muted-foreground">
-                    Import and manage your YouTube learning playlists
+                    Track your progress, patterns, and achievements
                 </p>
             </div>
 
-            {/* Import Section */}
-            <div className="mb-8">
-                <PlaylistManager />
+            {/* Key Metrics */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <Card>
+                    <CardContent className="flex items-center p-6">
+                        <Target className="h-8 w-8 text-green-600 mr-3" />
+                        <div>
+                            <p className="text-2xl font-bold">{Math.round(completionRate)}%</p>
+                            <p className="text-sm text-muted-foreground">Overall Completion</p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardContent className="flex items-center p-6">
+                        <Clock className="h-8 w-8 text-blue-600 mr-3" />
+                        <div>
+                            <p className="text-2xl font-bold">{formatWatchTime(totalWatchTime)}</p>
+                            <p className="text-sm text-muted-foreground">Total Watch Time</p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardContent className="flex items-center p-6">
+                        <Flame className="h-8 w-8 text-orange-600 mr-3" />
+                        <div>
+                            <p className="text-2xl font-bold">{streakDays}</p>
+                            <p className="text-sm text-muted-foreground">Day Streak</p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardContent className="flex items-center p-6">
+                        <BookOpen className="h-8 w-8 text-purple-600 mr-3" />
+                        <div>
+                            <p className="text-2xl font-bold">{totalNotes}</p>
+                            <p className="text-sm text-muted-foreground">Notes Created</p>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
 
-            {/* Playlists Section */}
-            {playlistsArray.length > 0 ? (
-                <div className="space-y-6">
-                    <div className="flex items-center gap-2 mb-4">
-                        <PlayCircle className="w-5 h-5" />
-                        <h2 className="text-2xl font-semibold">Your Playlists</h2>
-                        <Badge variant="secondary" className="ml-auto">
-                            {playlistsArray.length} playlist{playlistsArray.length !== 1 ? 's' : ''}
-                        </Badge>
-                    </div>
+            {/* Progress Overview */}
+            <div className="grid gap-6 md:grid-cols-2">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <TrendingUp className="w-5 h-5" />
+                            Progress Overview
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                                <span>Completed Videos</span>
+                                <span>{completedVideos} / {totalVideos}</span>
+                            </div>
+                            <Progress value={completionRate} className="h-2" />
+                        </div>
 
+                        <div className="grid grid-cols-3 gap-4 pt-4">
+                            <div className="text-center">
+                                <p className="text-2xl font-bold text-green-600">{completedVideos}</p>
+                                <p className="text-xs text-muted-foreground">Completed</p>
+                            </div>
+                            <div className="text-center">
+                                <p className="text-2xl font-bold text-blue-600">{inProgressVideos}</p>
+                                <p className="text-xs text-muted-foreground">In Progress</p>
+                            </div>
+                            <div className="text-center">
+                                <p className="text-2xl font-bold text-gray-600">{totalVideos - completedVideos - inProgressVideos}</p>
+                                <p className="text-xs text-muted-foreground">Not Started</p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Award className="w-5 h-5" />
+                            Achievements
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="space-y-3">
+                            {completedVideos >= 10 && (
+                                <div className="flex items-center gap-3 p-2 bg-green-50 rounded">
+                                    <Award className="w-6 h-6 text-green-600" />
+                                    <div>
+                                        <p className="font-medium text-sm">Video Master</p>
+                                        <p className="text-xs text-muted-foreground">Completed 10+ videos</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {streakDays >= 3 && (
+                                <div className="flex items-center gap-3 p-2 bg-orange-50 rounded">
+                                    <Flame className="w-6 h-6 text-orange-600" />
+                                    <div>
+                                        <p className="font-medium text-sm">Streak Keeper</p>
+                                        <p className="text-xs text-muted-foreground">{streakDays} day learning streak</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {totalNotes >= 5 && (
+                                <div className="flex items-center gap-3 p-2 bg-purple-50 rounded">
+                                    <BookOpen className="w-6 h-6 text-purple-600" />
+                                    <div>
+                                        <p className="font-medium text-sm">Note Taker</p>
+                                        <p className="text-xs text-muted-foreground">{totalNotes} notes created</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {playlistsArray.length >= 5 && (
+                                <div className="flex items-center gap-3 p-2 bg-blue-50 rounded">
+                                    <PlayCircle className="w-6 h-6 text-blue-600" />
+                                    <div>
+                                        <p className="font-medium text-sm">Playlist Collector</p>
+                                        <p className="text-xs text-muted-foreground">{playlistsArray.length} playlists imported</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {!(completedVideos >= 10 || streakDays >= 3 || totalNotes >= 5 || playlistsArray.length >= 5) && (
+                                <p className="text-sm text-muted-foreground">
+                                    Keep learning to unlock achievements!
+                                </p>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Playlist Analytics */}
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <BarChart3 className="w-5 h-5" />
+                        Playlist Breakdown
+                    </CardTitle>
+                    <CardDescription>
+                        Detailed progress for each of your imported playlists
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
                     <div className="space-y-4">
-                        {playlistsArray.map(playlist => (
-                            <PlaylistCard
-                                key={playlist.id}
-                                playlist={playlist}
-                                onVideoSelect={handleVideoSelect}
-                            />
+                        {playlistAnalytics.map(playlist => (
+                            <div key={playlist.id} className="border rounded-lg p-4 space-y-3">
+                                <div className="flex justify-between items-start">
+                                    <div className="space-y-1 flex-1 min-w-0">
+                                        <h3 className="font-medium line-clamp-2">{playlist.title}</h3>
+                                        <p className="text-sm text-muted-foreground">{playlist.channelTitle}</p>
+                                    </div>
+                                    <Badge variant="secondary" className="text-xs ml-4">
+                                        {Math.round(playlist.completionRate)}% complete
+                                    </Badge>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <div className="flex justify-between text-sm">
+                                        <span>Progress</span>
+                                        <span>{playlist.completedCount} / {playlist.videoCount} videos</span>
+                                    </div>
+                                    <Progress value={playlist.completionRate} className="h-1.5" />
+                                </div>
+
+                                <div className="flex justify-between text-xs text-muted-foreground">
+                                    <span>Watch time: {formatWatchTime(playlist.watchTime)}</span>
+                                    <span>Total duration: {formatWatchTime(playlist.totalDuration)}</span>
+                                </div>
+                            </div>
                         ))}
                     </div>
-                </div>
-            ) : (
-                <div className="text-center py-12 text-muted-foreground">
-                    <PlayCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <h3 className="text-lg font-semibold mb-2">No playlists yet</h3>
-                    <p>Import your first YouTube playlist to get started!</p>
-                </div>
-            )}
+                </CardContent>
+            </Card>
         </div>
     );
 }

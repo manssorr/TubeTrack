@@ -15,12 +15,16 @@
     "dev": "concurrently \"npm run dev -w server\" \"npm run dev -w client\"",
     "build": "npm run build -w shared && npm run build -w server && npm run build -w client",
     "test": "npm run test -w shared && npm run test -w server && npm run test -w client",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
     "lint": "npm run lint -w shared && npm run lint -w server && npm run lint -w client",
     "lint:fix": "npm run lint:fix -w shared && npm run lint:fix -w server && npm run lint:fix -w client",
     "type-check": "npm run type-check -w shared && npm run type-check -w server && npm run type-check -w client",
     "clean": "rm -rf node_modules client/node_modules server/node_modules shared/node_modules client/dist server/dist shared/dist"
   },
   "devDependencies": {
+    "@playwright/test": "^1.54.2",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "concurrently": "^8.2.2",

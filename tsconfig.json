@@ -28,6 +28,6 @@
       "@server/*": ["./server/src/*"]
     }
   },
-  "include": [],
+  "include": ["client/src/**/*", "server/src/**/*", "shared/src/**/*", "*.ts", "*.js"],
   "exclude": ["node_modules", "dist", "build", ".git"]
 }

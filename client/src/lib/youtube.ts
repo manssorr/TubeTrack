@@ -199,12 +199,19 @@ export function usePlaylistImport() {
             });
           } catch (videoError) {
             console.warn(`Failed to fetch details for video ${item.videoId}:`, videoError);
-            // Add video without duration info
+            
+            // Skip videos that are private, deleted, or restricted
+            if (videoError instanceof YouTubeAPIError && videoError.status === 404) {
+              console.log(`⚠️ Skipping unavailable video: ${item.videoId} - "${item.title}"`);
+              continue; // Don't add this video to the list
+            }
+            
+            // For other errors, add video with basic info
             allVideos.push({
               id: item.videoId,
-              title: item.title,
+              title: item.title || `Video ${item.videoId}`,
               channelTitle: item.channelTitle || "",
-              durationSec: 0,
+              durationSec: 0, // Unknown duration
               position: item.position,
               thumbnails: item.thumbnails || {},
             });
@@ -213,6 +220,14 @@ export function usePlaylistImport() {
 
         cursor = response.cursor || undefined;
       } while (cursor);
+
+      console.log(`✅ Import completed:`, {
+        playlistId,
+        playlistTitle,
+        totalVideos: totalItems || allVideos.length,
+        importedVideos: allVideos.length,
+        skippedVideos: (totalItems || 0) - allVideos.length,
+      });
 
       return {
         playlistId,

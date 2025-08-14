@@ -109,11 +109,18 @@ router.get("/youtube/video/:videoId", async (req, res, next) => {
       timeout: 12000,
     });
 
+    console.log(`📹 Video API response for ${videoId}:`, {
+      status: youtubeResponse.status,
+      itemsCount: youtubeResponse.data.items?.length || 0,
+      videoId
+    });
+
     const video = youtubeResponse.data.items?.[0];
     if (!video) {
+      console.log(`⚠️ Video not found: ${videoId}`);
       return res.status(404).json({
-        error: "Not Found",
-        message: "Video not found",
+        error: "Not Found", 
+        message: `Video not found or not accessible: ${videoId}`,
         statusCode: 404,
       });
     }

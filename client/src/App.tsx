@@ -4,20 +4,51 @@ import { ThemeProvider } from "./components/ThemeProvider.tsx";
 import AppHeader from "./components/AppHeader.tsx";
 import Home from "./pages/Home.tsx";
 import Playlists from "./pages/Playlists.tsx";
+import VideoPlayerPage from "./pages/VideoPlayer.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 function App() {
     return (
         <ThemeProvider defaultTheme="system" storageKey="tubetrack-ui-theme">
             <div className="min-h-screen bg-background">
-                <AppHeader />
-                <main>
-                    <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/playlists" element={<Playlists />} />
-                        <Route path="*" element={<NotFound />} />
-                    </Routes>
-                </main>
+                <Routes>
+                    {/* Video Player Route (full screen, no header) */}
+                    <Route path="/video/:videoId" element={<VideoPlayerPage />} />
+
+                    {/* Main Routes (with header) */}
+                    <Route path="/" element={
+                        <>
+                            <AppHeader />
+                            <main>
+                                <Home />
+                            </main>
+                        </>
+                    } />
+                    <Route path="/playlists" element={
+                        <>
+                            <AppHeader />
+                            <main>
+                                <Playlists />
+                            </main>
+                        </>
+                    } />
+                    <Route path="/analytics" element={
+                        <>
+                            <AppHeader />
+                            <main>
+                                <Playlists />
+                            </main>
+                        </>
+                    } />
+                    <Route path="*" element={
+                        <>
+                            <AppHeader />
+                            <main>
+                                <NotFound />
+                            </main>
+                        </>
+                    } />
+                </Routes>
 
                 <Toaster
                     position="bottom-right"

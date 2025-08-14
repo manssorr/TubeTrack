@@ -98,6 +98,7 @@ export default function PlaylistManager() {
                             onChange={(e) => setPlaylistInput(e.target.value)}
                             disabled={isImporting}
                             className={validation.error && playlistInput ? "border-destructive" : ""}
+                            data-testid="playlist-input"
                         />
                         {validation.error && playlistInput && (
                             <p className="text-sm text-destructive flex items-center gap-1">
@@ -110,6 +111,7 @@ export default function PlaylistManager() {
                         onClick={handleImport}
                         disabled={isImporting || !validation.isValid}
                         className="min-w-[100px]"
+                        data-testid="import-button"
                     >
                         {isImporting ? (
                             <>

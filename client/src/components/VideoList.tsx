@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { Play, Clock, User, CheckCircle, Circle, PlayCircle } from "lucide-react";
+import { useMemo } from "react";
+import { Play, User, CheckCircle, Circle, PlayCircle } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Progress } from "./ui/progress";
@@ -8,10 +8,10 @@ import { TVideo } from "@tubetrack/shared";
 
 interface VideoListProps {
     playlistId: string;
-    searchQuery?: string;
-    completionFilter?: "all" | "completed" | "in-progress" | "not-started";
-    sortBy?: "position" | "title" | "duration" | "completion";
-    onVideoSelect?: (videoId: string) => void;
+    searchQuery?: string | undefined;
+    completionFilter?: "all" | "completed" | "in-progress" | "not-started" | undefined;
+    sortBy?: "position" | "title" | "duration" | "completion" | undefined;
+    onVideoSelect?: ((videoId: string) => void) | undefined;
 }
 
 interface VideoItemProps {
@@ -21,7 +21,7 @@ interface VideoItemProps {
         watchedSeconds: number;
         lastWatchedAt: string;
     };
-    onSelect?: (videoId: string) => void;
+    onSelect: (videoId: string) => void;
 }
 
 function VideoItem({ video, progress, onSelect }: VideoItemProps) {
@@ -51,7 +51,7 @@ function VideoItem({ video, progress, onSelect }: VideoItemProps) {
     };
 
     const handleClick = () => {
-        onSelect?.(video.id);
+        onSelect(video.id);
     };
 
     return (
@@ -155,6 +155,7 @@ export default function VideoList({
     sortBy = "position",
     onVideoSelect,
 }: VideoListProps) {
+    const handleVideoSelect = onVideoSelect || (() => { });
     const { getVideosByPlaylist } = useVideos();
     const { getVideoProgress } = useProgress();
 
@@ -243,7 +244,7 @@ export default function VideoList({
                         key={video.id}
                         video={video}
                         progress={progress}
-                        onSelect={onVideoSelect}
+                        onSelect={handleVideoSelect}
                     />
                 );
             })}
