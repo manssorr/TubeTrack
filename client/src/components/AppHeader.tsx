@@ -1,9 +1,11 @@
 import { Moon, Sun, Monitor, Youtube } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useTheme } from "./ThemeProvider";
 
-function AppHeader() {
+export default function AppHeader() {
     const { theme, setTheme } = useTheme();
+    const location = useLocation();
 
     const cycleTheme = () => {
         if (theme === "light") {
@@ -46,24 +48,27 @@ function AppHeader() {
                 </div>
 
                 <nav className="hidden md:flex items-center gap-6">
-                    <a
-                        href="/"
-                        className="text-sm font-medium hover:text-primary transition-colors"
+                    <Link
+                        to="/"
+                        className={`text-sm font-medium hover:text-primary transition-colors ${location.pathname === "/" ? "text-primary" : "text-muted-foreground"
+                            }`}
                     >
                         Home
-                    </a>
-                    <a
-                        href="/playlists"
-                        className="text-sm font-medium hover:text-primary transition-colors"
+                    </Link>
+                    <Link
+                        to="/playlists"
+                        className={`text-sm font-medium hover:text-primary transition-colors ${location.pathname === "/playlists" ? "text-primary" : "text-muted-foreground"
+                            }`}
                     >
                         Playlists
-                    </a>
-                    <a
-                        href="/analytics"
-                        className="text-sm font-medium hover:text-primary transition-colors"
+                    </Link>
+                    <Link
+                        to="/analytics"
+                        className={`text-sm font-medium hover:text-primary transition-colors ${location.pathname === "/analytics" ? "text-primary" : "text-muted-foreground"
+                            }`}
                     >
                         Analytics
-                    </a>
+                    </Link>
                 </nav>
 
                 <div className="flex items-center gap-2">
@@ -81,28 +86,29 @@ function AppHeader() {
             {/* Mobile navigation */}
             <div className="md:hidden border-t px-4 py-2">
                 <nav className="flex items-center justify-center gap-4">
-                    <a
-                        href="/"
-                        className="text-sm font-medium hover:text-primary transition-colors"
+                    <Link
+                        to="/"
+                        className={`text-sm font-medium hover:text-primary transition-colors ${location.pathname === "/" ? "text-primary" : "text-muted-foreground"
+                            }`}
                     >
                         Home
-                    </a>
-                    <a
-                        href="/playlists"
-                        className="text-sm font-medium hover:text-primary transition-colors"
+                    </Link>
+                    <Link
+                        to="/playlists"
+                        className={`text-sm font-medium hover:text-primary transition-colors ${location.pathname === "/playlists" ? "text-primary" : "text-muted-foreground"
+                            }`}
                     >
                         Playlists
-                    </a>
-                    <a
-                        href="/analytics"
-                        className="text-sm font-medium hover:text-primary transition-colors"
+                    </Link>
+                    <Link
+                        to="/analytics"
+                        className={`text-sm font-medium hover:text-primary transition-colors ${location.pathname === "/analytics" ? "text-primary" : "text-muted-foreground"
+                            }`}
                     >
                         Analytics
-                    </a>
+                    </Link>
                 </nav>
             </div>
         </header>
     );
 }
-
-export default AppHeader;
