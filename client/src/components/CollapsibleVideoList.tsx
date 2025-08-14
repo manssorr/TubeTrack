@@ -15,9 +15,9 @@ interface CollapsibleVideoListProps {
   onToggleCollapse?: (collapsed: boolean) => void;
 }
 
-export function CollapsibleVideoList({ 
-  playlist, 
-  currentVideoIndex, 
+export function CollapsibleVideoList({
+  playlist,
+  currentVideoIndex,
   onVideoSelect,
   isCollapsed = false,
   onToggleCollapse
@@ -84,50 +84,47 @@ export function CollapsibleVideoList({
               {playlist.videos.map((video, index) => {
                 const progress = getVideoProgress(video);
                 const isActive = index === currentVideoIndex;
-                
+
                 return (
                   <div
                     key={video.id}
-                    className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                      isActive
+                    className={`p-3 rounded-lg border cursor-pointer transition-colors ${isActive
                         ? 'bg-primary/10 border-primary dark:bg-primary/20'
                         : 'bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
-                    }`}
+                      }`}
                     onClick={() => onVideoSelect(index)}
                   >
                     <div className="flex items-start space-x-3">
                       <div className="flex-shrink-0">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                          isActive 
-                            ? 'bg-primary text-primary-foreground' 
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isActive
+                            ? 'bg-primary text-primary-foreground'
                             : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300'
-                        }`}>
+                          }`}>
                           <Play className="w-4 h-4" />
                         </div>
                       </div>
-                      
+
                       <div className="flex-1 min-w-0">
-                        <h4 className={`text-sm font-medium line-clamp-2 ${
-                          isActive 
-                            ? 'text-primary' 
+                        <h4 className={`text-sm font-medium line-clamp-2 ${isActive
+                            ? 'text-primary'
                             : 'text-gray-900 dark:text-white'
-                        }`}>
+                          }`}>
                           {video.title}
                         </h4>
-                        
+
                         <div className="flex items-center justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
                           <span>{formatDuration(video.duration)}</span>
                           <span>{Math.round(progress)}% watched</span>
                         </div>
-                        
+
                         {/* Progress bar */}
                         <div className="mt-2">
-                          <Progress 
-                            value={progress} 
+                          <Progress
+                            value={progress}
                             className="h-1.5"
                           />
                         </div>
-                        
+
                         {/* Completion indicator */}
                         {video.completed && (
                           <div className="mt-1 text-xs text-green-600 dark:text-green-400 font-medium">

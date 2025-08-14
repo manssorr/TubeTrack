@@ -25,9 +25,9 @@ interface MarkdownNotesPanelProps {
   onRegisterInsertHandler?: (fn: (prefix: string) => void) => void;
 }
 
-export function MarkdownNotesPanel({ 
-  video, 
-  onNotesChange, 
+export function MarkdownNotesPanel({
+  video,
+  onNotesChange,
   onInsertTimestamp,
   onJumpToTimestamp,
   getCurrentTime,
@@ -54,7 +54,7 @@ export function MarkdownNotesPanel({
         const timestampRegex = /\[(\d+:\d+(?::\d+)?)\]\s*([^\n\[]*)/g;
         const convertedNotes: Note[] = [];
         let match;
-        
+
         while ((match = timestampRegex.exec(video.notes)) !== null) {
           const [, timestamp, content] = match;
           const seconds = parseTimeToSeconds(timestamp);
@@ -65,7 +65,7 @@ export function MarkdownNotesPanel({
             createdAt: new Date().toISOString()
           });
         }
-        
+
         setNotes(convertedNotes);
         if (convertedNotes.length > 0) {
           onNotesChange(JSON.stringify(convertedNotes));
@@ -179,7 +179,7 @@ export function MarkdownNotesPanel({
       setNewNoteContent((prev) => `${prefix}${prev}`);
     };
     onRegisterInsertHandler(handler);
-    return () => onRegisterInsertHandler(() => {});
+    return () => onRegisterInsertHandler(() => { });
   }, [onRegisterInsertHandler]);
 
   const NotesContent = () => (
@@ -199,7 +199,7 @@ export function MarkdownNotesPanel({
             {formatDuration(getCurrentTime())}
           </Button>
         </div>
-        
+
         <Textarea
           placeholder="Type your note here... (supports markdown formatting)"
           value={newNoteContent}
@@ -212,10 +212,10 @@ export function MarkdownNotesPanel({
           }}
           className={isFullWidth || isExpanded ? 'min-h-24' : 'min-h-16'}
         />
-        
-        <Button 
-          onClick={handleAddNote} 
-          disabled={!newNoteContent.trim()} 
+
+        <Button
+          onClick={handleAddNote}
+          disabled={!newNoteContent.trim()}
           className="w-full"
         >
           <Plus className="w-4 h-4 mr-2" />

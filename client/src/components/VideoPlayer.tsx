@@ -24,9 +24,9 @@ interface VideoPlayerProps {
   }) => void;
 }
 
-export function VideoPlayer({ 
-  video, 
-  onProgressUpdate, 
+export function VideoPlayer({
+  video,
+  onProgressUpdate,
   onMarkCheckpoint,
   onInsertTimestamp,
   playerMode = 'normal',
@@ -54,7 +54,7 @@ export function VideoPlayer({
     const YT = window.YT;
     if (YT) {
       setIsPlaying(state === YT.PlayerState.PLAYING);
-      
+
       if (state === YT.PlayerState.PLAYING) {
         setSessionStartTime(Date.now());
       }
@@ -222,7 +222,7 @@ export function VideoPlayer({
         {video.watchedSegments.map(([start, end], index) => {
           const startPercent = (start / video.duration) * 100;
           const widthPercent = ((end - start) / video.duration) * 100;
-          
+
           return (
             <div
               key={index}
@@ -234,7 +234,7 @@ export function VideoPlayer({
             />
           );
         })}
-        
+
         {/* Current position indicator */}
         {currentTime > 0 && (
           <div
@@ -268,13 +268,12 @@ export function VideoPlayer({
   const playerContent = (
     <div className={`relative ${getContainerClasses()}`} ref={playerContainerRef}>
       {/* YouTube Player */}
-      <div className={`relative ${
-        playerMode === 'fullscreen' ? 'h-screen' : 
+      <div className={`relative ${playerMode === 'fullscreen' ? 'h-screen' :
         playerMode === 'theater' ? 'aspect-video w-full' :
-        'aspect-video'
-      } bg-gray-900 ${shouldShowCard ? 'rounded-t-lg' : ''} overflow-hidden`}>
+          'aspect-video'
+        } bg-gray-900 ${shouldShowCard ? 'rounded-t-lg' : ''} overflow-hidden`}>
         <div ref={containerRef} className="w-full h-full" />
-        
+
         {/* Top Controls Bar (for theater/fullscreen modes) */}
         {(playerMode === 'theater' || playerMode === 'fullscreen') && (
           <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/70 to-transparent p-4 opacity-0 hover:opacity-100 transition-opacity">
@@ -284,15 +283,15 @@ export function VideoPlayer({
               </h3>
               <div className="flex items-center space-x-2">
                 {onModeChange && (
-                  <VideoPlayerModes 
-                    currentMode={playerMode} 
+                  <VideoPlayerModes
+                    currentMode={playerMode}
                     onModeChange={onModeChange}
                   />
                 )}
                 {playerMode === 'fullscreen' && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => document.exitFullscreen()}
                     className="text-white hover:bg-white/20"
                   >
@@ -303,17 +302,17 @@ export function VideoPlayer({
             </div>
           </div>
         )}
-        
-        
+
+
       </div>
-      
+
       {/* Additional info panel for normal mode */}
       {shouldShowCard && (
         <div className="p-4">
           <h3 className="font-medium text-gray-900 dark:text-white mb-2">
             {video.title}
           </h3>
-          
+
           {/* Detailed Progress */}
           <div className="space-y-2">
             <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">

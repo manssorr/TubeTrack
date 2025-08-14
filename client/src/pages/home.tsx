@@ -32,11 +32,11 @@ export default function Home() {
 
   // Local storage management for playlist caching
   const localStorage = useLocalStorage();
-  
+
   const analytics = useAnalytics(progressData);
   const currentPlaylist = getCurrentPlaylist();
   const currentVideo = getCurrentVideo();
-  
+
   // User settings with player mode
   const [userSettings, setUserSettings] = useState<UserSettings>({
     theme: 'light',
@@ -79,7 +79,7 @@ export default function Home() {
       ...prev,
       playlists: prev.playlists.filter(p => p.id !== playlistId)
     }));
-    
+
     // Reset current index if deleting current playlist
     if (currentPlaylist && currentPlaylist.id === playlistId) {
       setCurrentPlaylistIndex(0);
@@ -169,27 +169,26 @@ export default function Home() {
   return (
     <ThemeProvider>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <AppHeader 
-          onImport={handleImport} 
+        <AppHeader
+          onImport={handleImport}
           helpTrigger={<HelpWiki />}
         />
-        
-        <div className={`${
-          userSettings.videoPlayerMode === 'theater' 
-            ? 'max-w-full mx-auto px-2 sm:px-4 lg:px-6' 
+
+        <div className={`${userSettings.videoPlayerMode === 'theater'
+            ? 'max-w-full mx-auto px-2 sm:px-4 lg:px-6'
             : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'
-        } py-6`}>
+          } py-6`}>
           <Tabs defaultValue="playlists" className="space-y-6">
             <TabsList className="grid w-full grid-cols-3 bg-gray-100 dark:bg-gray-700">
               <TabsTrigger value="playlists" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 dark:data-[state=active]:bg-gray-800 dark:data-[state=active]:text-white dark:text-gray-300">My Playlists</TabsTrigger>
               <TabsTrigger value="learning" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 dark:data-[state=active]:bg-gray-800 dark:data-[state=active]:text-white dark:text-gray-300">Learning</TabsTrigger>
               <TabsTrigger value="analytics" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 dark:data-[state=active]:bg-gray-800 dark:data-[state=active]:text-white dark:text-gray-300">Analytics</TabsTrigger>
             </TabsList>
-            
+
             {/* Playlist Management Tab */}
             <TabsContent value="playlists" className="space-y-6">
               <PlaylistInput onPlaylistAdd={handlePlaylistAdd} />
-              
+
               <PlaylistManager
                 playlists={progressData.playlists}
                 currentPlaylistId={currentPlaylist?.id || null}
@@ -199,7 +198,7 @@ export default function Home() {
                 isLoading={localStorage.isLoading}
               />
             </TabsContent>
-            
+
             {/* Learning Tab */}
             <TabsContent value="learning">
               {currentPlaylist ? (
@@ -213,7 +212,7 @@ export default function Home() {
                       Player Mode: <span className="capitalize font-medium">{userSettings.videoPlayerMode}</span>
                     </div>
                   </div>
-                  
+
                   {/* Adaptive Layout Based on Player Mode */}
                   {userSettings.videoPlayerMode === 'focus' || userSettings.videoPlayerMode === 'fullscreen' ? (
                     // Minimal layout for focus/fullscreen modes
@@ -233,13 +232,13 @@ export default function Home() {
                           currentVideoIndex={currentPlaylist.currentVideoIndex}
                           onVideoSelect={handleVideoSelect}
                         />
-                          <MarkdownNotesPanel
+                        <MarkdownNotesPanel
                           video={currentVideo}
                           onNotesChange={handleNotesChange}
                           onInsertTimestamp={handleInsertTimestamp}
                           onJumpToTimestamp={handleJumpToTimestamp}
-                            getCurrentTime={getCurrentVideoTime}
-                            onRegisterInsertHandler={(fn) => { notesInsertHandlerRef.current = fn; }}
+                          getCurrentTime={getCurrentVideoTime}
+                          onRegisterInsertHandler={(fn) => { notesInsertHandlerRef.current = fn; }}
                         />
                       </div>
                     </div>
@@ -258,7 +257,7 @@ export default function Home() {
                           onExposeControls={setPlayerControls}
                         />
                       </div>
-                      
+
                       {/* Control panel below video */}
                       <VideoControlPanel
                         video={currentVideo}
@@ -266,7 +265,7 @@ export default function Home() {
                         onInsertTimestamp={handleInsertTimestamp}
                         getCurrentTime={getCurrentVideoTime}
                       />
-                      
+
                       {/* Side-by-side layout for video list and notes */}
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div className="lg:col-span-1">
@@ -304,12 +303,12 @@ export default function Home() {
                           onToggleCollapse={setIsVideoListCollapsed}
                         />
                       </div>
-                      
+
                       {/* Main content area - Video Player + Notes */}
                       <div className="flex-1 min-w-0 space-y-6">
                         {/* Video Player */}
                         <div className="w-full">
-                        <VideoPlayer
+                          <VideoPlayer
                             video={currentVideo}
                             onProgressUpdate={handleProgressUpdate}
                             onMarkCheckpoint={handleMarkCheckpoint}
@@ -319,7 +318,7 @@ export default function Home() {
                             onExposeControls={setPlayerControls}
                           />
                         </div>
-                        
+
                         {/* Video Control Panel - separate from player */}
                         <VideoControlPanel
                           video={currentVideo}
@@ -327,7 +326,7 @@ export default function Home() {
                           onInsertTimestamp={handleInsertTimestamp}
                           getCurrentTime={getCurrentVideoTime}
                         />
-                        
+
                         {/* Notes Panel - Below video */}
                         <MarkdownNotesPanel
                           video={currentVideo}
@@ -339,7 +338,7 @@ export default function Home() {
                           onRegisterInsertHandler={(fn) => { notesInsertHandlerRef.current = fn; }}
                         />
                       </div>
-                      
+
                       {/* Collapsed video list toggle when collapsed */}
                       {isVideoListCollapsed && (
                         <div className="fixed left-4 top-1/2 transform -translate-y-1/2 z-10">
@@ -365,7 +364,7 @@ export default function Home() {
                 </div>
               )}
             </TabsContent>
-            
+
             {/* Analytics Tab */}
             <TabsContent value="analytics">
               <AnalyticsDashboard analytics={analytics} />

@@ -51,16 +51,15 @@ export function VideoList({ playlist, currentVideoIndex, onVideoSelect }: VideoL
             {playlist.videos.map((video, index) => {
               const progress = getVideoProgress(video);
               const isActive = index === currentVideoIndex;
-              
+
               return (
                 <div
                   key={video.id}
                   onClick={() => onVideoSelect(index)}
-                  className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                    isActive
+                  className={`p-3 rounded-lg border cursor-pointer transition-colors ${isActive
                       ? 'border-primary bg-primary/5 dark:bg-primary/10'
                       : 'border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-start space-x-3">
                     <div className="flex-shrink-0">
@@ -81,8 +80,8 @@ export function VideoList({ playlist, currentVideoIndex, onVideoSelect }: VideoL
                         </span>
                       </div>
                       <div className="mt-2">
-                        <Progress 
-                          value={progress} 
+                        <Progress
+                          value={progress}
                           className="h-1.5"
                         />
                       </div>
