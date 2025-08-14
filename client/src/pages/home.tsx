@@ -3,7 +3,9 @@ import { AppHeader } from '@/components/AppHeader';
 import { PlaylistInput } from '@/components/PlaylistInput';
 import { VideoList } from '@/components/VideoList';
 import { VideoPlayer } from '@/components/VideoPlayer';
-import { NotePanelWithItems } from '@/components/NotePanelWithItems';
+import { MarkdownNotesPanel } from '@/components/MarkdownNotesPanel';
+import { CollapsibleVideoList } from '@/components/CollapsibleVideoList';
+import { VideoControlPanel } from '@/components/VideoControlPanel';
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
 import { PlaylistManager } from '@/components/PlaylistManager';
 import { HelpWiki } from '@/components/HelpWiki';
@@ -138,6 +140,7 @@ export default function Home() {
   // Current time ref to share between video player and notes
   const [currentVideoTime, setCurrentVideoTime] = useState(0);
   const [videoPlayerRef, setVideoPlayerRef] = useState<any>(null);
+  const [isVideoListCollapsed, setIsVideoListCollapsed] = useState(false);
 
   // Handle timestamp insertion (for keyboard shortcut)
   const handleInsertTimestamp = useCallback((timestamp: string) => {
@@ -165,10 +168,10 @@ export default function Home() {
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <Tabs defaultValue="playlists" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="playlists">My Playlists</TabsTrigger>
-              <TabsTrigger value="learning">Learning</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 bg-gray-100 dark:bg-gray-700">
+              <TabsTrigger value="playlists" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 dark:data-[state=active]:bg-gray-800 dark:data-[state=active]:text-white dark:text-gray-300">My Playlists</TabsTrigger>
+              <TabsTrigger value="learning" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 dark:data-[state=active]:bg-gray-800 dark:data-[state=active]:text-white dark:text-gray-300">Learning</TabsTrigger>
+              <TabsTrigger value="analytics" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 dark:data-[state=active]:bg-gray-800 dark:data-[state=active]:text-white dark:text-gray-300">Analytics</TabsTrigger>
             </TabsList>
             
             {/* Playlist Management Tab */}
@@ -217,7 +220,7 @@ export default function Home() {
                           currentVideoIndex={currentPlaylist.currentVideoIndex}
                           onVideoSelect={handleVideoSelect}
                         />
-                        <NotePanelWithItems
+                        <MarkdownNotesPanel
                           video={currentVideo}
                           onNotesChange={handleNotesChange}
                           onInsertTimestamp={handleInsertTimestamp}
@@ -229,17 +232,25 @@ export default function Home() {
                   ) : (
                     // Standard layout for normal/theater modes
                     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                      {/* Video List */}
-                      <div className="lg:col-span-1">
-                        <VideoList
+                      {/* Collapsible Video List */}
+                      <div className={isVideoListCollapsed ? "w-auto" : "lg:col-span-1"}>
+                        <CollapsibleVideoList
                           playlist={currentPlaylist}
                           currentVideoIndex={currentPlaylist.currentVideoIndex}
                           onVideoSelect={handleVideoSelect}
+                          isCollapsed={isVideoListCollapsed}
+                          onToggleCollapse={setIsVideoListCollapsed}
                         />
                       </div>
                       
                       {/* Video Player */}
-                      <div className={userSettings.videoPlayerMode === 'theater' ? 'lg:col-span-3' : 'lg:col-span-2'}>
+                      <div className={`${
+                        userSettings.videoPlayerMode === 'theater' 
+                          ? 'lg:col-span-3' 
+                          : isVideoListCollapsed 
+                            ? 'lg:col-span-3' 
+                            : 'lg:col-span-2'
+                      } space-y-4`}>
                         <VideoPlayer
                           video={currentVideo}
                           onProgressUpdate={handleProgressUpdate}
@@ -248,12 +259,20 @@ export default function Home() {
                           playerMode={userSettings.videoPlayerMode}
                           onModeChange={handlePlayerModeChange}
                         />
+                        
+                        {/* Video Control Panel - separate from player */}
+                        <VideoControlPanel
+                          video={currentVideo}
+                          onMarkCheckpoint={handleMarkCheckpoint}
+                          onInsertTimestamp={handleInsertTimestamp}
+                          getCurrentTime={getCurrentVideoTime}
+                        />
                       </div>
                       
                       {/* Notes Panel - hidden in theater mode to give more space */}
                       {userSettings.videoPlayerMode !== 'theater' && (
                         <div className="lg:col-span-1">
-                          <NotePanelWithItems
+                          <MarkdownNotesPanel
                             video={currentVideo}
                             onNotesChange={handleNotesChange}
                             onInsertTimestamp={handleInsertTimestamp}
@@ -265,15 +284,16 @@ export default function Home() {
                     </div>
                   )}
                   
-                  {/* Notes Panel for Theater Mode (below player) */}
+                  {/* Notes Panel for Theater Mode (below player with full width) */}
                   {userSettings.videoPlayerMode === 'theater' && (
-                    <div className="max-w-4xl">
-                      <NotePanelWithItems
+                    <div className="w-full">
+                      <MarkdownNotesPanel
                         video={currentVideo}
                         onNotesChange={handleNotesChange}
                         onInsertTimestamp={handleInsertTimestamp}
                         onJumpToTimestamp={handleJumpToTimestamp}
                         getCurrentTime={getCurrentVideoTime}
+                        isFullWidth={true}
                       />
                     </div>
                   )}
