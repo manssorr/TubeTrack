@@ -30,7 +30,7 @@ export default function VideoPlayerPage() {
     const [playbackRate, setPlaybackRate] = useState(1);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
-    
+
     // Seek function reference
     const seekFunctionRef = useRef<((seconds: number) => void) | null>(null);
 
