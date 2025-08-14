@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import VideoPlayer from "@/components/VideoPlayer";
 import VideoControlPanel from "@/components/VideoControlPanel";
-import MarkdownNotesPanel from "@/components/MarkdownNotesPanel";
+import VideoNotesPanel from "@/components/VideoNotesPanel";
 import { useVideos, useProgress, usePlaylists } from "@/hooks/useLocalStorage";
 import { useVideoKeyboardShortcuts, KeyboardShortcutsHelp } from "@/hooks/useVideoKeyboardShortcuts";
 
@@ -24,6 +24,7 @@ export default function VideoPlayerPage() {
     const navigate = useNavigate();
     const [showPlaylist, setShowPlaylist] = useState(false);
     const [showNotes, setShowNotes] = useState(true);
+    const [notesPosition, setNotesPosition] = useState<'side' | 'bottom'>('side');
 
     // Player state
     const [playing, setPlaying] = useState(false);
@@ -264,15 +265,23 @@ export default function VideoPlayerPage() {
             </div>
 
             <div className="container mx-auto px-4 py-6">
-                <div className={`grid gap-6 ${showPlaylist && showNotes ? 'xl:grid-cols-4' :
-                    showPlaylist || showNotes ? 'lg:grid-cols-3' :
-                        'lg:grid-cols-1'
+                <div className={`grid gap-6 ${notesPosition === 'bottom' ? (
+                    showPlaylist ? 'lg:grid-cols-3' : 'lg:grid-cols-1'
+                ) : (
+                    showPlaylist && showNotes ? 'xl:grid-cols-4' :
+                        showPlaylist || showNotes ? 'lg:grid-cols-3' :
+                            'lg:grid-cols-1'
+                )
                     }`}>
                     {/* Main Video Player */}
                     <div className={
-                        showPlaylist && showNotes ? 'xl:col-span-2' :
-                            showPlaylist || showNotes ? 'lg:col-span-2' :
-                                'lg:col-span-1'
+                        notesPosition === 'bottom' ? (
+                            showPlaylist ? 'lg:col-span-2' : 'lg:col-span-1'
+                        ) : (
+                            showPlaylist && showNotes ? 'xl:col-span-2' :
+                                showPlaylist || showNotes ? 'lg:col-span-2' :
+                                    'lg:col-span-1'
+                        )
                     }>
                         <div className="space-y-4">
                             {/* Video Player */}
@@ -380,13 +389,15 @@ export default function VideoPlayerPage() {
                         </div>
                     </div>
 
-                    {/* Notes Panel */}
-                    {showNotes && (
+                    {/* Notes Panel - Side Position */}
+                    {showNotes && notesPosition === 'side' && (
                         <div className="lg:col-span-1">
-                            <MarkdownNotesPanel
+                            <VideoNotesPanel
                                 videoId={videoId || ''}
                                 currentTime={currentTime}
                                 onTimestampClick={handleSeek}
+                                position={notesPosition}
+                                onPositionChange={setNotesPosition}
                                 className="h-[600px]"
                             />
                         </div>
@@ -459,6 +470,20 @@ export default function VideoPlayerPage() {
                         </div>
                     )}
                 </div>
+
+                {/* Notes Panel - Bottom Position */}
+                {showNotes && notesPosition === 'bottom' && (
+                    <div className="mt-6">
+                        <VideoNotesPanel
+                            videoId={videoId || ''}
+                            currentTime={currentTime}
+                            onTimestampClick={handleSeek}
+                            position={notesPosition}
+                            onPositionChange={setNotesPosition}
+                            className="h-[400px]"
+                        />
+                    </div>
+                )}
             </div>
         </div>
     );
