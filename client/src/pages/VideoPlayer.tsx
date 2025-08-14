@@ -1,24 +1,145 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, SkipBack, SkipForward, List } from "lucide-react";
+import { ArrowLeft, SkipBack, SkipForward, List, Keyboard } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
+} from "@/components/ui/dialog";
 
 import VideoPlayer from "@/components/VideoPlayer";
+import VideoControlPanel from "@/components/VideoControlPanel";
 import { useVideos, useProgress, usePlaylists } from "@/hooks/useLocalStorage";
+import { useVideoKeyboardShortcuts, KeyboardShortcutsHelp } from "@/hooks/useVideoKeyboardShortcuts";
 
 export default function VideoPlayerPage() {
     const { videoId } = useParams<{ videoId: string }>();
     const navigate = useNavigate();
     const [showPlaylist, setShowPlaylist] = useState(false);
 
+    // Player state
+    const [playing, setPlaying] = useState(false);
+    const [volume, setVolume] = useState(1);
+    const [muted, setMuted] = useState(false);
+    const [playbackRate, setPlaybackRate] = useState(1);
+    const [currentTime, setCurrentTime] = useState(0);
+    const [duration, setDuration] = useState(0);
+
     const { videos } = useVideos();
     const { getVideoProgress } = useProgress();
     const { playlists } = usePlaylists();
 
-    if (!videoId || !videos[videoId]) {
+    // Player control handlers
+    const handlePlayPause = () => setPlaying(!playing);
+
+    const handleSeek = (seconds: number) => {
+        setCurrentTime(seconds);
+        // Note: Actual seeking is handled by the VideoPlayer component via its ref
+    };
+
+    const handleSeekRelative = (delta: number) => {
+        const newTime = Math.max(0, Math.min(duration, currentTime + delta));
+        handleSeek(newTime);
+    };
+
+    const handleVolumeChange = (newVolume: number) => {
+        setVolume(newVolume);
+        if (newVolume > 0 && muted) {
+            setMuted(false);
+        }
+    };
+
+    const handleMuteToggle = () => setMuted(!muted);
+
+    const handlePlaybackRateChange = (rate: number) => setPlaybackRate(rate);
+
+    const handleVolumeUp = () => {
+        const newVolume = Math.min(1, volume + 0.1);
+        handleVolumeChange(newVolume);
+    };
+
+    const handleVolumeDown = () => {
+        const newVolume = Math.max(0, volume - 0.1);
+        handleVolumeChange(newVolume);
+    };
+
+    const handleSpeedDecrease = () => {
+        const rates = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+        const currentIndex = rates.indexOf(playbackRate);
+        if (currentIndex > 0) {
+            const newRate = rates[currentIndex - 1];
+            if (newRate !== undefined) {
+                setPlaybackRate(newRate);
+            }
+        }
+    };
+
+    const handleSpeedIncrease = () => {
+        const rates = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+        const currentIndex = rates.indexOf(playbackRate);
+        if (currentIndex < rates.length - 1) {
+            const newRate = rates[currentIndex + 1];
+            if (newRate !== undefined) {
+                setPlaybackRate(newRate);
+            }
+        }
+    };
+
+    const handleSeekToPercentage = (percentage: number) => {
+        const newTime = (percentage / 100) * duration;
+        handleSeek(newTime);
+    };
+
+    // Get video data and navigation
+    const currentVideo = videoId ? videos[videoId] : null;
+    const playlist = currentVideo ? playlists[currentVideo.playlistId] : null;
+    const progress = videoId ? getVideoProgress(videoId) : null;
+
+    // Get playlist videos for navigation
+    const playlistVideos = currentVideo
+        ? Object.values(videos)
+            .filter(v => v.playlistId === currentVideo.playlistId)
+            .sort((a, b) => a.position - b.position)
+        : [];
+
+    const currentIndex = playlistVideos.findIndex(v => v.id === videoId);
+    const previousVideo = currentIndex > 0 ? playlistVideos[currentIndex - 1] : null;
+    const nextVideo = currentIndex < playlistVideos.length - 1 ? playlistVideos[currentIndex + 1] : null;
+
+    const handlePrevious = () => {
+        if (previousVideo) {
+            navigate(`/video/${previousVideo.id}`);
+        }
+    };
+
+    const handleNext = () => {
+        if (nextVideo) {
+            navigate(`/video/${nextVideo.id}`);
+        }
+    };
+
+    // Keyboard shortcuts
+    useVideoKeyboardShortcuts({
+        onPlayPause: handlePlayPause,
+        onSeekBackward: (seconds = 5) => handleSeekRelative(-seconds),
+        onSeekForward: (seconds = 5) => handleSeekRelative(seconds),
+        onVolumeUp: handleVolumeUp,
+        onVolumeDown: handleVolumeDown,
+        onMuteToggle: handleMuteToggle,
+        onSpeedDecrease: handleSpeedDecrease,
+        onSpeedIncrease: handleSpeedIncrease,
+        ...(previousVideo && { onPrevious: handlePrevious }),
+        ...(nextVideo && { onNext: handleNext }),
+        onSeekToPercentage: handleSeekToPercentage,
+    });
+
+    if (!videoId || !currentVideo) {
         return (
             <div className="container mx-auto py-8">
                 <div className="text-center">
@@ -35,33 +156,8 @@ export default function VideoPlayerPage() {
         );
     }
 
-    const currentVideo = videos[videoId];
-    const playlist = playlists[currentVideo.playlistId];
-    const progress = getVideoProgress(videoId);
-
-    // Get playlist videos for navigation
-    const playlistVideos = Object.values(videos)
-        .filter(v => v.playlistId === currentVideo.playlistId)
-        .sort((a, b) => a.position - b.position);
-
-    const currentIndex = playlistVideos.findIndex(v => v.id === videoId);
-    const previousVideo = currentIndex > 0 ? playlistVideos[currentIndex - 1] : null;
-    const nextVideo = currentIndex < playlistVideos.length - 1 ? playlistVideos[currentIndex + 1] : null;
-
     const handleVideoEnd = () => {
         // Auto-advance to next video
-        if (nextVideo) {
-            navigate(`/video/${nextVideo.id}`);
-        }
-    };
-
-    const handlePreviousVideo = () => {
-        if (previousVideo) {
-            navigate(`/video/${previousVideo.id}`);
-        }
-    };
-
-    const handleNextVideo = () => {
         if (nextVideo) {
             navigate(`/video/${nextVideo.id}`);
         }
@@ -77,8 +173,6 @@ export default function VideoPlayerPage() {
         }
         return `${mins}:${secs.toString().padStart(2, "0")}`;
     };
-
-    const completionPercentage = Math.round(progress.completion * 100);
 
     return (
         <div className="min-h-screen bg-background">
@@ -100,7 +194,7 @@ export default function VideoPlayerPage() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        onClick={handlePreviousVideo}
+                                        onClick={handlePrevious}
                                         title="Previous video"
                                     >
                                         <SkipBack className="w-4 h-4" />
@@ -111,7 +205,7 @@ export default function VideoPlayerPage() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        onClick={handleNextVideo}
+                                        onClick={handleNext}
                                         title="Next video"
                                     >
                                         <SkipForward className="w-4 h-4" />
@@ -120,15 +214,32 @@ export default function VideoPlayerPage() {
                             </div>
                         </div>
 
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setShowPlaylist(!showPlaylist)}
-                            className="flex items-center gap-2"
-                        >
-                            <List className="w-4 h-4" />
-                            Playlist
-                        </Button>
+                        <div className="flex items-center gap-2">
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button variant="ghost" size="sm">
+                                        <Keyboard className="w-4 h-4 mr-2" />
+                                        Shortcuts
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-md">
+                                    <DialogHeader>
+                                        <DialogTitle>Keyboard Shortcuts</DialogTitle>
+                                    </DialogHeader>
+                                    <KeyboardShortcutsHelp />
+                                </DialogContent>
+                            </Dialog>
+
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setShowPlaylist(!showPlaylist)}
+                                className="flex items-center gap-2"
+                            >
+                                <List className="w-4 h-4" />
+                                Playlist
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -142,8 +253,50 @@ export default function VideoPlayerPage() {
                             <div className="aspect-video">
                                 <VideoPlayer
                                     videoId={videoId}
+                                    playing={playing}
+                                    volume={volume}
+                                    muted={muted}
+                                    playbackRate={playbackRate}
+                                    controls={false}
+                                    width="100%"
+                                    height="100%"
+                                    resumeFromLastPosition={true}
+                                    onReady={() => {
+                                        console.log('Video ready');
+                                    }}
+                                    onPlay={() => setPlaying(true)}
+                                    onPause={() => setPlaying(false)}
+                                    onProgress={(state) => {
+                                        setCurrentTime(state.playedSeconds);
+                                        if (state.duration && !duration) {
+                                            setDuration(state.duration);
+                                        }
+                                    }}
                                     onVideoEnd={handleVideoEnd}
+                                    onError={(error) => {
+                                        console.error('Video error:', error);
+                                    }}
                                     className="w-full h-full"
+                                />
+
+                                {/* Custom Video Controls */}
+                                <VideoControlPanel
+                                    playing={playing}
+                                    currentTime={currentTime}
+                                    duration={duration}
+                                    volume={volume}
+                                    muted={muted}
+                                    playbackRate={playbackRate}
+                                    onPlayPause={handlePlayPause}
+                                    onSeek={handleSeek}
+                                    onVolumeChange={handleVolumeChange}
+                                    onMuteToggle={handleMuteToggle}
+                                    onPlaybackRateChange={handlePlaybackRateChange}
+                                    onSeekRelative={handleSeekRelative}
+                                    {...(previousVideo && { onPrevious: handlePrevious })}
+                                    {...(nextVideo && { onNext: handleNext })}
+                                    showNavigationButtons={true}
+                                    className="mt-2"
                                 />
                             </div>
 
@@ -164,13 +317,13 @@ export default function VideoPlayerPage() {
 
                                 {/* Progress Info */}
                                 <div className="flex items-center gap-4">
-                                    <Badge variant={progress.completion >= 0.9 ? "default" : progress.watchedSeconds > 0 ? "secondary" : "outline"}>
-                                        {progress.completion >= 0.9 ? "Completed" : progress.watchedSeconds > 0 ? "In Progress" : "Not Started"}
+                                    <Badge variant={progress && progress.completion >= 0.9 ? "default" : progress && progress.watchedSeconds > 0 ? "secondary" : "outline"}>
+                                        {progress && progress.completion >= 0.9 ? "Completed" : progress && progress.watchedSeconds > 0 ? "In Progress" : "Not Started"}
                                     </Badge>
 
-                                    {progress.watchedSeconds > 0 && (
+                                    {progress && progress.watchedSeconds > 0 && (
                                         <span className="text-sm text-muted-foreground">
-                                            {completionPercentage}% watched
+                                            {Math.round((progress.completion || 0) * 100)}% watched
                                         </span>
                                     )}
                                 </div>
