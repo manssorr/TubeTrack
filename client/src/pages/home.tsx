@@ -3,7 +3,7 @@ import { AppHeader } from '@/components/AppHeader';
 import { PlaylistInput } from '@/components/PlaylistInput';
 import { VideoList } from '@/components/VideoList';
 import { VideoPlayer } from '@/components/VideoPlayer';
-import { NotesPanel } from '@/components/NotesPanel';
+import { NotePanelWithItems } from '@/components/NotePanelWithItems';
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
 import { PlaylistManager } from '@/components/PlaylistManager';
 import { HelpWiki } from '@/components/HelpWiki';
@@ -38,8 +38,12 @@ export default function Home() {
   // User settings with player mode
   const [userSettings, setUserSettings] = useState<UserSettings>({
     theme: 'light',
+    darkMode: false,
     videoPlayerMode: 'normal',
-    autoSave: true
+    autoSave: true,
+    autoSaveInterval: 30000,
+    showKeyboardShortcuts: true,
+    autoMarkCompleted: false
   });
 
   // Handle importing progress data
@@ -108,6 +112,7 @@ export default function Home() {
 
   // Handle progress updates
   const handleProgressUpdate = useCallback((currentTime: number, actualTimeSpent: number) => {
+    setCurrentVideoTime(currentTime); // Update current time state
     if (currentPlaylist && currentVideo) {
       updateVideoProgress(currentPlaylist.id, currentVideo.id, {
         lastPosition: currentTime,
@@ -130,17 +135,25 @@ export default function Home() {
     }
   }, [currentPlaylist, currentVideo, updateVideoProgress]);
 
+  // Current time ref to share between video player and notes
+  const [currentVideoTime, setCurrentVideoTime] = useState(0);
+  const [videoPlayerRef, setVideoPlayerRef] = useState<any>(null);
+
   // Handle timestamp insertion (for keyboard shortcut)
   const handleInsertTimestamp = useCallback((timestamp: string) => {
-    // This will be handled by NotesPanel component
     console.log('Insert timestamp:', timestamp);
   }, []);
 
   // Handle jumping to timestamp
   const handleJumpToTimestamp = useCallback((seconds: number) => {
-    // This will be handled by VideoPlayer component
     console.log('Jump to timestamp:', seconds);
+    // This will be handled by the VideoPlayer component through the YouTube API
   }, []);
+
+  // Get current video time
+  const getCurrentVideoTime = useCallback(() => {
+    return currentVideoTime;
+  }, [currentVideoTime]);
 
   return (
     <ThemeProvider>
@@ -204,12 +217,12 @@ export default function Home() {
                           currentVideoIndex={currentPlaylist.currentVideoIndex}
                           onVideoSelect={handleVideoSelect}
                         />
-                        <NotesPanel
+                        <NotePanelWithItems
                           video={currentVideo}
                           onNotesChange={handleNotesChange}
                           onInsertTimestamp={handleInsertTimestamp}
                           onJumpToTimestamp={handleJumpToTimestamp}
-                          getCurrentTime={() => 0}
+                          getCurrentTime={getCurrentVideoTime}
                         />
                       </div>
                     </div>
@@ -240,12 +253,12 @@ export default function Home() {
                       {/* Notes Panel - hidden in theater mode to give more space */}
                       {userSettings.videoPlayerMode !== 'theater' && (
                         <div className="lg:col-span-1">
-                          <NotesPanel
+                          <NotePanelWithItems
                             video={currentVideo}
                             onNotesChange={handleNotesChange}
                             onInsertTimestamp={handleInsertTimestamp}
                             onJumpToTimestamp={handleJumpToTimestamp}
-                            getCurrentTime={() => 0}
+                            getCurrentTime={getCurrentVideoTime}
                           />
                         </div>
                       )}
@@ -255,12 +268,12 @@ export default function Home() {
                   {/* Notes Panel for Theater Mode (below player) */}
                   {userSettings.videoPlayerMode === 'theater' && (
                     <div className="max-w-4xl">
-                      <NotesPanel
+                      <NotePanelWithItems
                         video={currentVideo}
                         onNotesChange={handleNotesChange}
                         onInsertTimestamp={handleInsertTimestamp}
                         onJumpToTimestamp={handleJumpToTimestamp}
-                        getCurrentTime={() => 0}
+                        getCurrentTime={getCurrentVideoTime}
                       />
                     </div>
                   )}
