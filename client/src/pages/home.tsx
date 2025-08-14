@@ -281,9 +281,9 @@ export default function Home() {
                     </div>
                   ) : (
                     // Standard layout for normal mode
-                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                      {/* Collapsible Video List */}
-                      <div className={isVideoListCollapsed ? "w-auto" : "lg:col-span-1"}>
+                    <div className="flex gap-6">
+                      {/* Collapsible Video List - Fixed width when visible, zero when collapsed */}
+                      <div className={isVideoListCollapsed ? "w-0 overflow-hidden" : "w-80 flex-shrink-0"}>
                         <CollapsibleVideoList
                           playlist={currentPlaylist}
                           currentVideoIndex={currentPlaylist.currentVideoIndex}
@@ -293,18 +293,19 @@ export default function Home() {
                         />
                       </div>
                       
-                      {/* Video Player */}
-                      <div className={`${
-                        isVideoListCollapsed ? 'lg:col-span-3' : 'lg:col-span-2'
-                      } space-y-4`}>
-                        <VideoPlayer
-                          video={currentVideo}
-                          onProgressUpdate={handleProgressUpdate}
-                          onMarkCheckpoint={handleMarkCheckpoint}
-                          onInsertTimestamp={handleInsertTimestamp}
-                          playerMode={userSettings.videoPlayerMode}
-                          onModeChange={handlePlayerModeChange}
-                        />
+                      {/* Main content area - Video Player + Notes */}
+                      <div className="flex-1 min-w-0 space-y-6">
+                        {/* Video Player */}
+                        <div className="w-full">
+                          <VideoPlayer
+                            video={currentVideo}
+                            onProgressUpdate={handleProgressUpdate}
+                            onMarkCheckpoint={handleMarkCheckpoint}
+                            onInsertTimestamp={handleInsertTimestamp}
+                            playerMode={userSettings.videoPlayerMode}
+                            onModeChange={handlePlayerModeChange}
+                          />
+                        </div>
                         
                         {/* Video Control Panel - separate from player */}
                         <VideoControlPanel
@@ -313,17 +314,27 @@ export default function Home() {
                           onInsertTimestamp={handleInsertTimestamp}
                           getCurrentTime={getCurrentVideoTime}
                         />
+                        
+                        {/* Notes Panel - Below video */}
+                        <MarkdownNotesPanel
+                          video={currentVideo}
+                          onNotesChange={handleNotesChange}
+                          onInsertTimestamp={handleInsertTimestamp}
+                          onJumpToTimestamp={handleJumpToTimestamp}
+                          getCurrentTime={getCurrentVideoTime}
+                          isFullWidth={true}
+                        />
                       </div>
                       
-                      {/* Notes Panel */}
-                      {!isVideoListCollapsed && (
-                        <div className="lg:col-span-1">
-                          <MarkdownNotesPanel
-                            video={currentVideo}
-                            onNotesChange={handleNotesChange}
-                            onInsertTimestamp={handleInsertTimestamp}
-                            onJumpToTimestamp={handleJumpToTimestamp}
-                            getCurrentTime={getCurrentVideoTime}
+                      {/* Collapsed video list toggle when collapsed */}
+                      {isVideoListCollapsed && (
+                        <div className="fixed left-4 top-1/2 transform -translate-y-1/2 z-10">
+                          <CollapsibleVideoList
+                            playlist={currentPlaylist}
+                            currentVideoIndex={currentPlaylist.currentVideoIndex}
+                            onVideoSelect={handleVideoSelect}
+                            isCollapsed={isVideoListCollapsed}
+                            onToggleCollapse={setIsVideoListCollapsed}
                           />
                         </div>
                       )}
