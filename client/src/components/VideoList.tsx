@@ -1,10 +1,12 @@
 import { useMemo } from "react";
 import { Play, User, CheckCircle, Circle, PlayCircle } from "lucide-react";
+import { TVideo } from "@tubetrack/shared";
+
+import { useVideos, useProgress } from "../hooks/useLocalStorage";
+
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Progress } from "./ui/progress";
-import { useVideos, useProgress } from "../hooks/useLocalStorage";
-import { TVideo } from "@tubetrack/shared";
 
 interface VideoListProps {
     playlistId: string;

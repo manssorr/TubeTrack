@@ -22,6 +22,11 @@ export class YouTubeAPIError extends Error {
   }
 }
 
+type RequestInit = {
+  headers?: Record<string, string>;
+  body?: string;
+};
+
 // API request helper with error handling
 async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
   try {
@@ -199,13 +204,13 @@ export function usePlaylistImport() {
             });
           } catch (videoError) {
             console.warn(`Failed to fetch details for video ${item.videoId}:`, videoError);
-            
+
             // Skip videos that are private, deleted, or restricted
             if (videoError instanceof YouTubeAPIError && videoError.status === 404) {
               console.log(`⚠️ Skipping unavailable video: ${item.videoId} - "${item.title}"`);
               continue; // Don't add this video to the list
             }
-            
+
             // For other errors, add video with basic info
             allVideos.push({
               id: item.videoId,

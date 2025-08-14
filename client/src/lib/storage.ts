@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
 import {
   AppState,
   TAppState,
@@ -179,7 +181,7 @@ export const storage: StorageInterface = {
 };
 
 // Debounced save utility for frequent updates (like notes)
-let saveTimeout: NodeJS.Timeout | null = null;
+let saveTimeout: ReturnType<typeof setTimeout> | null = null;
 
 export function withPersist<T extends any[], R>(
   fn: (...args: T) => R,
@@ -221,7 +223,7 @@ export const storageHelpers = {
 
   removePlaylist(playlistId: string): void {
     storage.update("playlists", playlists => {
-      const { [playlistId]: removed, ...rest } = playlists;
+      const { [playlistId]: _removed, ...rest } = playlists;
       return rest;
     });
 
@@ -266,7 +268,7 @@ export const storageHelpers = {
 
   removeNote(noteId: string): void {
     storage.update("notes", notes => {
-      const { [noteId]: removed, ...rest } = notes;
+      const { [noteId]: _removed, ...rest } = notes;
       return rest;
     });
   },

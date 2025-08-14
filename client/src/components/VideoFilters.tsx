@@ -1,5 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Search, Filter, SortAsc, X } from "lucide-react";
+
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
@@ -164,7 +165,7 @@ export default function VideoFilters({
                 <div className="flex flex-wrap gap-2">
                     {searchQuery && (
                         <Badge variant="secondary" className="gap-1">
-                            Search: "{searchQuery}"
+                            Search: &quot;{searchQuery}&quot;
                             <Button
                                 variant="ghost"
                                 size="sm"

@@ -1,11 +1,13 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, SkipBack, SkipForward, List } from "lucide-react";
 import { useState } from "react";
-import VideoPlayer from "../components/VideoPlayer";
+
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
-import { useVideos, useProgress, usePlaylists } from "../hooks/useLocalStorage";
+
+import VideoPlayer from "@/components/VideoPlayer";
+import { useVideos, useProgress, usePlaylists } from "@/hooks/useLocalStorage";
 
 export default function VideoPlayerPage() {
     const { videoId } = useParams<{ videoId: string }>();
@@ -214,7 +216,16 @@ export default function VideoPlayerPage() {
                                                     key={video.id}
                                                     className={`p-3 border-b cursor-pointer hover:bg-muted/50 transition-colors ${isCurrentVideo ? 'bg-primary/10 border-primary/20' : ''
                                                         }`}
+                                                    role="button"
+                                                    tabIndex={0}
+                                                    aria-current={isCurrentVideo ? "true" : undefined}
                                                     onClick={() => !isCurrentVideo && navigate(`/video/${video.id}`)}
+                                                    onKeyDown={e => {
+                                                        if (!isCurrentVideo && (e.key === "Enter" || e.key === " ")) {
+                                                            e.preventDefault();
+                                                            navigate(`/video/${video.id}`);
+                                                        }
+                                                    }}
                                                 >
                                                     <div className="flex gap-3">
                                                         <div className="flex-shrink-0 text-sm text-muted-foreground w-8">

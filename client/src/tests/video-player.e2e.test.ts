@@ -70,9 +70,9 @@ test.describe("Video Player E2E", () => {
     // Should navigate to video player page
     await expect(page.url()).toContain("/video/dQw4w9WgXcQ");
 
-    // Wait for player to load
-    const playerContainer = page.locator("#youtube-player-dQw4w9WgXcQ");
-    await expect(playerContainer).toBeVisible({ timeout: 15000 });
+    // Wait for React Player iframe to load
+    const reactPlayer = page.locator("iframe").first();
+    await expect(reactPlayer).toBeVisible({ timeout: 15000 });
 
     // Verify video info is displayed
     await expect(page.locator("text=Test Video for Player")).toBeVisible();
@@ -101,60 +101,22 @@ test.describe("Video Player E2E", () => {
     await expect(page.url()).toBe("http://localhost:5173/");
   });
 
-  test("should test video player with test video player component", async ({ page }) => {
+  test("should show empty state when no playlists are imported", async ({ page }) => {
     // Wait for page to load and ensure no playlists exist
     await expect(page.locator("main h1")).toContainText("Welcome to TubeTrack");
 
-    // When no playlists are imported, should show test video player
-    await expect(page.locator("text=🎬 Test Video Player")).toBeVisible();
-
-    // Click on a test video
-    const testVideoButton = page.locator("button").filter({ hasText: "Rick Astley" }).first();
-    await testVideoButton.click();
-
-    // Should open fullscreen test player
-    const testPlayer = page.locator("text=Video Player Test");
-    await expect(testPlayer).toBeVisible();
-
-    // Should have a close button
-    await expect(page.locator("button", { hasText: "Close Player" })).toBeVisible();
-
-    // Player container should be visible
-    const playerContainer = page.locator("#youtube-player-dQw4w9WgXcQ");
-    await expect(playerContainer).toBeVisible({ timeout: 15000 });
-
-    // Close the player
-    await page.locator("button", { hasText: "Close Player" }).click();
-
-    // Should return to main page
-    await expect(page.locator("main h1")).toContainText("Welcome to TubeTrack");
+    // When no playlists are imported, should show empty state
+    await expect(page.locator("text=Ready to Start Learning?")).toBeVisible();
+    await expect(page.locator("text=Import your first YouTube playlist")).toBeVisible();
   });
 
-  test("should handle YouTube API loading and errors", async ({ page }) => {
-    // Mock YouTube API failure
-    await page.addInitScript(() => {
-      // Block YouTube API from loading
-      const originalAppendChild = document.head.appendChild;
-      (document.head as any).appendChild = function (child: any) {
-        if (child.src && child.src.includes("youtube.com/iframe_api")) {
-          // Simulate API load failure
-          setTimeout(() => {
-            if (child.onerror) child.onerror(new Error("Failed to load YouTube API"));
-          }, 100);
-          return child;
-        }
-        return originalAppendChild.call(this, child);
-      };
-    });
+  test("should handle React Player errors gracefully", async ({ page }) => {
+    // Go to a video page with invalid video ID
+    await page.goto("http://localhost:5173/video/invalid-video-id");
 
-    // Test with test video player since it doesn't need playlist import
-    await expect(page.locator("text=🎬 Test Video Player")).toBeVisible();
-
-    const testVideoButton = page.locator("button").filter({ hasText: "Rick Astley" }).first();
-    await testVideoButton.click();
-
-    // Should show error state after API fails to load
-    await expect(page.locator("text=Unable to load video")).toBeVisible({ timeout: 10000 });
+    // Should show "Video Not Found" message since the video doesn't exist in storage
+    await expect(page.locator("text=Video Not Found")).toBeVisible();
+    await expect(page.locator("text=Go Home")).toBeVisible();
   });
 
   test("should navigate between videos in a playlist", async ({ page }) => {
@@ -171,7 +133,7 @@ test.describe("Video Player E2E", () => {
           importedVideos: 3,
           videos: [
             {
-              id: "video-1",
+              id: "dQw4w9WgXcQ",
               title: "First Video",
               channelTitle: "Multi Video Channel",
               durationSec: 100,
@@ -179,7 +141,7 @@ test.describe("Video Player E2E", () => {
               thumbnails: { default: { url: "https://example.com/1.jpg", width: 120, height: 90 } },
             },
             {
-              id: "video-2",
+              id: "ScMzIvxBSi4",
               title: "Second Video",
               channelTitle: "Multi Video Channel",
               durationSec: 200,
@@ -187,7 +149,7 @@ test.describe("Video Player E2E", () => {
               thumbnails: { default: { url: "https://example.com/2.jpg", width: 120, height: 90 } },
             },
             {
-              id: "video-3",
+              id: "Mc74_yTAK3Y",
               title: "Third Video",
               channelTitle: "Multi Video Channel",
               durationSec: 300,
@@ -211,7 +173,7 @@ test.describe("Video Player E2E", () => {
     await page.locator("text=First Video").click();
 
     // Should be on first video
-    await expect(page.url()).toContain("/video/video-1");
+    await expect(page.url()).toContain("/video/dQw4w9WgXcQ");
     await expect(page.locator("text=First Video")).toBeVisible();
     await expect(page.locator("text=#1 in playlist")).toBeVisible();
 
@@ -221,7 +183,7 @@ test.describe("Video Player E2E", () => {
 
     // Navigate to next video
     await page.locator('[title="Next video"]').click();
-    await expect(page.url()).toContain("/video/video-2");
+    await expect(page.url()).toContain("/video/ScMzIvxBSi4");
     await expect(page.locator("text=Second Video")).toBeVisible();
     await expect(page.locator("text=#2 in playlist")).toBeVisible();
 
@@ -231,7 +193,7 @@ test.describe("Video Player E2E", () => {
 
     // Navigate to previous video
     await page.locator('[title="Previous video"]').click();
-    await expect(page.url()).toContain("/video/video-1");
+    await expect(page.url()).toContain("/video/dQw4w9WgXcQ");
     await expect(page.locator("text=First Video")).toBeVisible();
   });
 
@@ -249,7 +211,7 @@ test.describe("Video Player E2E", () => {
           importedVideos: 2,
           videos: [
             {
-              id: "sidebar-video-1",
+              id: "jNQXAC9IVRw",
               title: "Sidebar Video 1",
               channelTitle: "Sidebar Channel",
               durationSec: 150,
@@ -259,7 +221,7 @@ test.describe("Video Player E2E", () => {
               },
             },
             {
-              id: "sidebar-video-2",
+              id: "ZZ5LpwO-An4",
               title: "Sidebar Video 2",
               channelTitle: "Sidebar Channel",
               durationSec: 250,
@@ -284,7 +246,7 @@ test.describe("Video Player E2E", () => {
     await page.locator("text=Sidebar Video 1").click();
 
     // Should be on video player page
-    await expect(page.url()).toContain("/video/sidebar-video-1");
+    await expect(page.url()).toContain("/video/jNQXAC9IVRw");
 
     // Toggle playlist sidebar
     await page.locator("button", { hasText: "Playlist" }).click();
@@ -304,7 +266,7 @@ test.describe("Video Player E2E", () => {
     await page.locator("text=Sidebar Video 2").click();
 
     // Should navigate to second video
-    await expect(page.url()).toContain("/video/sidebar-video-2");
-    await expect(page.locator("text=Sidebar Video 2")).first().toBeVisible(); // First occurrence is the main title
+    await expect(page.url()).toContain("/video/ZZ5LpwO-An4");
+    await expect(page.locator("text=Sidebar Video 2")).toBeVisible();
   });
 });

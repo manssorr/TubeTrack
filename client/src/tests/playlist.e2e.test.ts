@@ -30,7 +30,7 @@ test.describe("Playlist Management E2E", () => {
           importedVideos: 3,
           videos: [
             {
-              id: "test-video-1",
+              id: "dQw4w9WgXcQ",
               title: "Test Video 1",
               channelTitle: "React Test Channel",
               durationSec: 300,
@@ -40,7 +40,7 @@ test.describe("Playlist Management E2E", () => {
               },
             },
             {
-              id: "test-video-2",
+              id: "ScMzIvxBSi4",
               title: "Test Video 2",
               channelTitle: "React Test Channel",
               durationSec: 450,
@@ -50,7 +50,7 @@ test.describe("Playlist Management E2E", () => {
               },
             },
             {
-              id: "test-video-3",
+              id: "Mc74_yTAK3Y",
               title: "Test Video 3",
               channelTitle: "React Test Channel",
               durationSec: 600,
@@ -108,7 +108,7 @@ test.describe("Playlist Management E2E", () => {
           importedVideos: 1,
           videos: [
             {
-              id: "test-video",
+              id: "dQw4w9WgXcQ",
               title: "Test Video",
               channelTitle: "Test Channel",
               durationSec: 300,
@@ -185,7 +185,7 @@ test.describe("Playlist Management E2E", () => {
           importedVideos: 2,
           videos: [
             {
-              id: "progress-video-1",
+              id: "jNQXAC9IVRw",
               title: "Progress Video 1",
               channelTitle: "Progress Channel",
               durationSec: 100,
@@ -195,7 +195,7 @@ test.describe("Playlist Management E2E", () => {
               },
             },
             {
-              id: "progress-video-2",
+              id: "ZZ5LpwO-An4",
               title: "Progress Video 2",
               channelTitle: "Progress Channel",
               durationSec: 200,

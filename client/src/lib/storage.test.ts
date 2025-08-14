@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { storage, storageHelpers, StorageError } from "./storage";
 import { APP_STATE_VERSION, LOCAL_STORAGE_KEY } from "@tubetrack/shared";
+
+import { storage, storageHelpers, StorageError } from "./storage";
 
 // Mock localStorage
 const mockLocalStorage = {

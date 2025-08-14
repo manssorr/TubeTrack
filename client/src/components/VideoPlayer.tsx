@@ -15,18 +15,15 @@ export default function VideoPlayer({
 
     return (
         <div className={`bg-black rounded-lg overflow-hidden ${className}`}>
-            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             <ReactPlayer
-                {...{
-                    url: videoUrl,
-                    width: "100%",
-                    height: "100%",
-                    controls: true,
-                    onEnded: onVideoEnd,
-                    onError: (error: any) => {
-                        console.error('Video player error:', error);
-                    }
-                } as any}
+                src={videoUrl}
+                width="100%"
+                height="100%"
+                onEnded={onVideoEnd}
+                onError={(error: unknown) => {
+                    console.error('Video player error:', error);
+                }}
+
             />
         </div>
     );

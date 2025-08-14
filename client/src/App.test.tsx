@@ -1,8 +1,9 @@
-import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
-import { BrowserRouter } from "react-router-dom";
-
+import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter } from "react-router-dom";
+import { render } from "@testing-library/react";
+import { describe, it, expect } from "vitest";
+
 import App from "./App.tsx";
 
 // Test wrapper component
@@ -25,46 +26,46 @@ function TestWrapper({ children }: { children: React.ReactNode }) {
 
 describe("App", () => {
     it("renders the home page", () => {
-        render(
+        const { getByText } = render(
             <TestWrapper>
                 <App />
             </TestWrapper>
         );
 
         // Check that the main heading is present
-        expect(screen.getByText("Welcome to TubeTrack")).toBeInTheDocument();
+        expect(getByText("Welcome to TubeTrack")).toBeDefined();
 
         // Check that some feature cards are present (including emojis)
-        expect(screen.getByText("📚 Import Playlists")).toBeInTheDocument();
-        expect(screen.getByText("🎯 Track Progress")).toBeInTheDocument();
-        expect(screen.getByText("📝 Take Notes")).toBeInTheDocument();
+        expect(getByText("📚 Import Playlists")).toBeDefined();
+        expect(getByText("🎯 Track Progress")).toBeDefined();
+        expect(getByText("📝 Take Notes")).toBeDefined();
     });
 
     it("renders the app header", () => {
-        render(
+        const { getByText, getAllByText } = render(
             <TestWrapper>
                 <App />
             </TestWrapper>
         );
 
         // Check that the header is present
-        expect(screen.getByText("TubeTrack")).toBeInTheDocument();
+        expect(getByText("TubeTrack")).toBeDefined();
 
         // Check navigation links (using getAllBy since there are desktop + mobile versions)
-        expect(screen.getAllByText("Home")).toHaveLength(2); // Desktop + mobile
-        expect(screen.getAllByText("Playlists")).toHaveLength(2);
-        expect(screen.getAllByText("Analytics")).toHaveLength(2);
+        expect(getAllByText("Home")).toHaveLength(2); // Desktop + mobile
+        expect(getAllByText("Playlists")).toHaveLength(2);
+        expect(getAllByText("Analytics")).toHaveLength(2);
     });
 
     it("has theme toggle functionality", () => {
-        render(
+        const { getByRole } = render(
             <TestWrapper>
                 <App />
             </TestWrapper>
         );
 
         // Theme toggle button should be present
-        const themeButton = screen.getByRole("button");
-        expect(themeButton).toBeInTheDocument();
+        const themeButton = getByRole("button");
+        expect(themeButton).toBeDefined();
     });
 });

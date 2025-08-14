@@ -1,6 +1,8 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect, useCallback } from "react";
-import { storage, StorageError } from "../lib/storage";
-import { TAppState } from "../types";
+
+import { storage, StorageError } from "@/lib/storage";
+import { TAppState } from "@/types";
 
 // Custom hook for reactive local storage
 export function useLocalStorage() {
@@ -119,7 +121,8 @@ export function usePlaylists() {
   const removePlaylist = useCallback(
     (playlistId: string) => {
       updateField("playlists", playlists => {
-        const { [playlistId]: removed, ...rest } = playlists;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { [playlistId]: _removed, ...rest } = playlists;
         return rest;
       });
 
@@ -237,7 +240,8 @@ export function useNotes() {
   const removeNote = useCallback(
     (noteId: string) => {
       updateField("notes", notes => {
-        const { [noteId]: removed, ...rest } = notes;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { [noteId]: _removed, ...rest } = notes;
         return rest;
       });
     },
