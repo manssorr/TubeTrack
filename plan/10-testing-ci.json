@@ -1,0 +1,134 @@
+{
+  "phase": "10-testing-ci",
+  "title": "Testing & CI/CD",
+  "description": "Implement comprehensive testing suite and continuous integration",
+  "dependencies": ["09-analytics-dashboard"],
+  "todos": [
+    {
+      "id": "client-testing-setup",
+      "title": "Set up client-side testing",
+      "description": "Configure Vitest and React Testing Library for client",
+      "tasks": [
+        "Install Vitest and React Testing Library",
+        "Configure vitest.config.ts for client",
+        "Set up jsdom environment for browser APIs",
+        "Create test utilities and custom render",
+        "Add MSW (Mock Service Worker) for API mocking",
+        "Configure test coverage reporting",
+        "Add test scripts to package.json"
+      ],
+      "completion_criteria": "Client testing framework is fully configured and working"
+    },
+    {
+      "id": "server-testing-setup",
+      "title": "Set up server-side testing",
+      "description": "Configure testing for Express server",
+      "tasks": [
+        "Configure Vitest for server testing",
+        "Install and set up supertest for HTTP testing",
+        "Create test utilities for server setup/teardown",
+        "Mock YouTube API responses",
+        "Set up test environment variables",
+        "Configure test database (if needed)",
+        "Add server test scripts"
+      ],
+      "completion_criteria": "Server testing framework is configured with API mocking"
+    },
+    {
+      "id": "unit-tests-client",
+      "title": "Write client unit tests",
+      "description": "Create unit tests for React components and hooks",
+      "tasks": [
+        "Test PlaylistManager component (input validation, import flow)",
+        "Test VideoList components (rendering, filtering, sorting)",
+        "Test VideoPlayer component (playback, controls, errors)",
+        "Test MarkdownNotesPanel (editing, autosave, timestamps)",
+        "Test useYouTubePlayer hook (mocked API)",
+        "Test useProgressTracker hook (time tracking)",
+        "Test analytics calculations",
+        "Test localStorage utilities and migrations"
+      ],
+      "completion_criteria": "Key client components and hooks have comprehensive unit tests"
+    },
+    {
+      "id": "unit-tests-server",
+      "title": "Write server unit tests",
+      "description": "Create unit tests for server endpoints and middleware",
+      "tasks": [
+        "Test /api/health endpoint",
+        "Test YouTube proxy endpoints with pagination",
+        "Test rate limiting functionality",
+        "Test error handling middleware",
+        "Test CORS and security middleware",
+        "Test input validation with zod schemas",
+        "Mock YouTube API responses properly"
+      ],
+      "completion_criteria": "Server endpoints and middleware are thoroughly tested"
+    },
+    {
+      "id": "integration-tests",
+      "title": "Write integration tests",
+      "description": "Test full user flows and component integration",
+      "tasks": [
+        "Test playlist import end-to-end flow",
+        "Test video watching and progress tracking",
+        "Test note taking with timestamps",
+        "Test search and filtering functionality",
+        "Test theme switching and persistence",
+        "Test player controls and keyboard shortcuts",
+        "Test analytics data accuracy"
+      ],
+      "completion_criteria": "Critical user flows are tested end-to-end"
+    },
+    {
+      "id": "e2e-testing-plan",
+      "title": "Create E2E testing strategy",
+      "description": "Design end-to-end testing approach",
+      "tasks": [
+        "Document E2E testing strategy with Playwright",
+        "Create test scenarios for critical user paths",
+        "Design test data setup and teardown",
+        "Plan cross-browser testing approach",
+        "Document mobile testing strategy",
+        "Create performance testing guidelines",
+        "Set up E2E CI integration plan"
+      ],
+      "completion_criteria": "Comprehensive E2E testing plan is documented"
+    },
+    {
+      "id": "github-actions-ci",
+      "title": "Set up GitHub Actions CI",
+      "description": "Create CI pipeline for automated testing and building",
+      "tasks": [
+        "Create .github/workflows/ci.yml",
+        "Set up Node.js environment with caching",
+        "Add dependency installation step",
+        "Configure TypeScript type checking",
+        "Add linting and formatting checks",
+        "Run unit and integration tests",
+        "Add build verification for client and server",
+        "Configure test coverage reporting",
+        "Set up matrix testing for multiple Node versions",
+        "Add status checks for PRs"
+      ],
+      "completion_criteria": "CI pipeline runs successfully on push and PR"
+    },
+    {
+      "id": "test-coverage",
+      "title": "Achieve good test coverage",
+      "description": "Ensure comprehensive test coverage across codebase",
+      "tasks": [
+        "Set up coverage reporting tools",
+        "Identify coverage gaps and add tests",
+        "Aim for >80% coverage on critical paths",
+        "Add coverage badges to README",
+        "Configure coverage thresholds in CI",
+        "Document testing guidelines",
+        "Add test examples for future development"
+      ],
+      "completion_criteria": "Test coverage meets quality standards with clear reporting"
+    }
+  ],
+  "test_strategy": "Comprehensive unit, integration, and E2E testing with CI automation",
+  "estimated_time": "6-8 hours"
+}

@@ -1,0 +1,114 @@
+{
+  "phase": "08-notes-system",
+  "title": "Markdown Notes System",
+  "description": "Implement markdown notes with timestamps, tags, and autosave",
+  "dependencies": ["07-video-player"],
+  "todos": [
+    {
+      "id": "markdown-editor",
+      "title": "Create markdown notes editor",
+      "description": "Build markdown editor with live preview",
+      "tasks": [
+        "Install react-markdown and remark-gfm",
+        "Create MarkdownNotesPanel component",
+        "Add textarea with monospace font",
+        "Implement split view (editor + preview)",
+        "Add toggle between edit/preview modes",
+        "Style editor and preview consistently",
+        "Handle markdown rendering with proper styling"
+      ],
+      "completion_criteria": "Markdown editor works with live preview and proper styling"
+    },
+    {
+      "id": "timestamp-system",
+      "title": "Implement timestamp functionality",
+      "description": "Add timestamp insertion and seeking",
+      "tasks": [
+        "Create timestamp insertion button",
+        "Format timestamps as [mm:ss] at current player time",
+        "Parse timestamps from markdown content",
+        "Make timestamps clickable in preview",
+        "Implement video seeking when timestamp clicked",
+        "Add timestamp validation and error handling",
+        "Style timestamps distinctly in preview"
+      ],
+      "completion_criteria": "Timestamps can be inserted and clicked to seek video"
+    },
+    {
+      "id": "autosave-system",
+      "title": "Implement autosave functionality",
+      "description": "Auto-save notes with debouncing and feedback",
+      "tasks": [
+        "Add debounced autosave (500ms delay)",
+        "Show save status indicators (saving, saved, error)",
+        "Persist notes to localStorage by video ID",
+        "Handle concurrent edits and conflicts",
+        "Add manual save button as backup",
+        "Show toast notifications for save status",
+        "Test autosave reliability"
+      ],
+      "completion_criteria": "Notes autosave reliably with proper user feedback"
+    },
+    {
+      "id": "tag-system",
+      "title": "Add tag extraction and management",
+      "description": "Extract and display hashtags from notes",
+      "tasks": [
+        "Parse hashtags (#tag) from note content",
+        "Extract tags and store in note data",
+        "Display tags as badges in video lists",
+        "Add tag-based filtering to video lists",
+        "Create tag management UI",
+        "Handle tag updates when notes change",
+        "Add tag autocomplete suggestions"
+      ],
+      "completion_criteria": "Tags are extracted, displayed, and filterable"
+    },
+    {
+      "id": "notes-management",
+      "title": "Build notes management features",
+      "description": "Add note creation, editing, and organization",
+      "tasks": [
+        "Create note CRUD operations",
+        "Generate unique note IDs (uuid)",
+        "Handle multiple notes per video (optional)",
+        "Add note timestamps (created, updated)",
+        "Implement note search functionality",
+        "Add note export/import capabilities",
+        "Create note history/versioning (optional)"
+      ],
+      "completion_criteria": "Notes can be managed efficiently with search and organization"
+    },
+    {
+      "id": "notes-ui-integration",
+      "title": "Integrate notes with player UI",
+      "description": "Connect notes panel with video player",
+      "tasks": [
+        "Position notes panel alongside player",
+        "Handle responsive layout for notes + player",
+        "Add notes panel toggle/collapse",
+        "Show notes indicator in video lists",
+        "Handle focus management between player and notes",
+        "Add keyboard shortcuts for notes actions",
+        "Test notes UI on different screen sizes"
+      ],
+      "completion_criteria": "Notes integrate seamlessly with player interface"
+    },
+    {
+      "id": "notes-performance",
+      "title": "Optimize notes performance",
+      "description": "Ensure smooth performance with large notes",
+      "tasks": [
+        "Optimize markdown rendering performance",
+        "Add virtualization for large note content",
+        "Debounce tag extraction and parsing",
+        "Optimize timestamp parsing and rendering",
+        "Test performance with very long notes",
+        "Add loading states for heavy operations"
+      ],
+      "completion_criteria": "Notes system performs well with large content"
+    }
+  ],
+  "test_strategy": "Test markdown rendering, timestamp functionality, autosave reliability, and tag extraction",
+  "estimated_time": "5-6 hours"
+}

@@ -1,0 +1,99 @@
+{
+  "phase": "06-video-lists",
+  "title": "Video Lists & Search",
+  "description": "Implement video browsing with search, filters, and collapsible sections",
+  "dependencies": ["05-playlist-management"],
+  "todos": [
+    {
+      "id": "basic-video-list",
+      "title": "Create basic VideoList component",
+      "description": "Build flat list view for videos with basic info",
+      "tasks": [
+        "Create VideoList component",
+        "Display video thumbnails, titles, durations",
+        "Add channel information and position",
+        "Show progress indicators and completion status",
+        "Make video items clickable for playback",
+        "Add responsive grid layout",
+        "Style with shadcn/ui components"
+      ],
+      "completion_criteria": "Video list displays all video information clearly"
+    },
+    {
+      "id": "collapsible-sections",
+      "title": "Implement CollapsibleVideoList",
+      "description": "Add collapsible sections for better organization",
+      "tasks": [
+        "Create CollapsibleVideoList component",
+        "Group videos by sections (e.g., 10 videos per section)",
+        "Add collapsible section headers",
+        "Show section progress and statistics",
+        "Maintain section state in localStorage",
+        "Add expand/collapse all functionality",
+        "Test with large playlists performance"
+      ],
+      "completion_criteria": "Videos are organized in collapsible sections with good performance"
+    },
+    {
+      "id": "search-functionality",
+      "title": "Add search and filtering",
+      "description": "Implement search and filter capabilities",
+      "tasks": [
+        "Add search input with debounced queries",
+        "Implement title and channel search",
+        "Add completion status filters (all, completed, in-progress, not-started)",
+        "Create filter UI with badges/chips",
+        "Highlight search matches in results",
+        "Add clear search/filters functionality",
+        "Persist search state in URL params"
+      ],
+      "completion_criteria": "Search and filters work smoothly with good UX"
+    },
+    {
+      "id": "sorting-options",
+      "title": "Add sorting capabilities",
+      "description": "Allow users to sort videos by different criteria",
+      "tasks": [
+        "Add sort dropdown/selector",
+        "Implement sort by position (default)",
+        "Add sort by title (A-Z, Z-A)",
+        "Add sort by duration (shortest/longest first)",
+        "Add sort by completion status",
+        "Add sort by last watched date",
+        "Persist sort preference in localStorage"
+      ],
+      "completion_criteria": "Users can sort videos by various criteria"
+    },
+    {
+      "id": "progress-indicators",
+      "title": "Enhanced progress visualization",
+      "description": "Add detailed progress indicators and badges",
+      "tasks": [
+        "Create progress bars for individual videos",
+        "Add completion badges and icons",
+        "Show watch time vs. duration",
+        "Add last watched timestamps",
+        "Create progress overview for sections",
+        "Add notes indicators (badges for videos with notes)",
+        "Style progress indicators consistently"
+      ],
+      "completion_criteria": "Progress is clearly visible throughout the video lists"
+    },
+    {
+      "id": "mobile-optimization",
+      "title": "Optimize for mobile devices",
+      "description": "Ensure video lists work well on mobile",
+      "tasks": [
+        "Test responsive layout on mobile sizes",
+        "Optimize touch interactions",
+        "Adjust thumbnail sizes for mobile",
+        "Make search and filters mobile-friendly",
+        "Add swipe gestures if needed",
+        "Test performance on mobile devices"
+      ],
+      "completion_criteria": "Video lists are fully functional and performant on mobile"
+    }
+  ],
+  "test_strategy": "Test search performance, filter combinations, sorting, and mobile responsiveness",
+  "estimated_time": "4-5 hours"
+}

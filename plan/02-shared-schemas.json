@@ -1,0 +1,52 @@
+{
+  "phase": "02-shared-schemas",
+  "title": "Shared Types & Schemas",
+  "description": "Implement zod schemas and TypeScript types shared between client and server",
+  "dependencies": ["01-project-setup"],
+  "todos": [
+    {
+      "id": "core-schemas",
+      "title": "Create core data schemas",
+      "description": "Define Playlist, Video, Progress, Note schemas with zod",
+      "tasks": [
+        "Set up shared/package.json with zod dependency",
+        "Create shared/src/schema.ts",
+        "Define Thumbnail schema with validation",
+        "Define Playlist schema with required fields",
+        "Define Video schema with duration and position",
+        "Define Progress schema with completion tracking",
+        "Define Note schema with timestamps and tags",
+        "Export TypeScript types from zod schemas"
+      ],
+      "completion_criteria": "All schemas validate correctly with proper TypeScript types"
+    },
+    {
+      "id": "app-state-schema",
+      "title": "Create app state and settings schemas",
+      "description": "Define Settings and AppState schemas for local storage",
+      "tasks": [
+        "Define Settings schema with theme, player options",
+        "Define AppState schema with version and collections",
+        "Create helper types for record mappings",
+        "Add validation for nested structures",
+        "Export all schemas and types"
+      ],
+      "completion_criteria": "AppState schema supports full data model with migrations"
+    },
+    {
+      "id": "api-schemas",
+      "title": "Create API request/response schemas",
+      "description": "Define schemas for client-server communication",
+      "tasks": [
+        "Create API response schemas for YouTube data",
+        "Define pagination schemas with cursor",
+        "Create error response schemas",
+        "Add request validation schemas",
+        "Export API types for client and server"
+      ],
+      "completion_criteria": "All API contracts have proper validation and types"
+    }
+  ],
+  "test_strategy": "Unit tests for schema validation with valid/invalid inputs",
+  "estimated_time": "1-2 hours"
+}

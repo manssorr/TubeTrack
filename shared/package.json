@@ -1,0 +1,22 @@
+{
+  "name": "@tubetrack/shared",
+  "version": "0.1.0",
+  "description": "Shared types and schemas for TubeTrack",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "test": "vitest",
+    "test:run": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "vitest": "^1.4.0"
+  }
+}

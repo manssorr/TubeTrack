@@ -1,0 +1,106 @@
+{
+  "phase": "04-client-foundation",
+  "title": "Client Foundation",
+  "description": "Set up React app with Vite, TailwindCSS, shadcn/ui, and routing",
+  "dependencies": ["02-shared-schemas"],
+  "todos": [
+    {
+      "id": "vite-react-setup",
+      "title": "Initialize React app with Vite",
+      "description": "Create React application with modern build tools",
+      "tasks": [
+        "Set up client/package.json with React 18 + Vite 5",
+        "Create index.html and src/main.tsx",
+        "Configure Vite config with TypeScript",
+        "Set up development server and build scripts",
+        "Add React DOM and necessary dependencies",
+        "Create basic App.tsx component"
+      ],
+      "completion_criteria": "React app runs in development with hot reload"
+    },
+    {
+      "id": "tailwind-setup",
+      "title": "Configure TailwindCSS",
+      "description": "Set up TailwindCSS with PostCSS",
+      "tasks": [
+        "Install TailwindCSS and PostCSS",
+        "Create tailwind.config.ts with content paths",
+        "Create postcss.config.js",
+        "Add Tailwind directives to index.css",
+        "Test Tailwind classes work in components"
+      ],
+      "completion_criteria": "TailwindCSS styling works throughout the app"
+    },
+    {
+      "id": "shadcn-ui-setup",
+      "title": "Install and configure shadcn/ui",
+      "description": "Set up shadcn/ui component library",
+      "tasks": [
+        "Install shadcn/ui CLI and dependencies",
+        "Initialize shadcn/ui configuration",
+        "Set up components.json config file",
+        "Install basic components (Button, Card, Input)",
+        "Create lib/utils.ts with cn helper",
+        "Test shadcn components render correctly"
+      ],
+      "completion_criteria": "shadcn/ui components work with proper styling"
+    },
+    {
+      "id": "routing-setup",
+      "title": "Set up client-side routing",
+      "description": "Configure React Router for navigation",
+      "tasks": [
+        "Install React Router DOM",
+        "Create src/pages/ directory structure",
+        "Create Home, NotFound page components",
+        "Set up routing in App.tsx",
+        "Add navigation structure",
+        "Test route navigation works"
+      ],
+      "completion_criteria": "Client-side routing works between pages"
+    },
+    {
+      "id": "theme-provider",
+      "title": "Implement theme system",
+      "description": "Add dark/light theme support",
+      "tasks": [
+        "Create ThemeProvider component",
+        "Set up theme context and hook",
+        "Add theme toggle functionality",
+        "Configure dark mode classes in Tailwind",
+        "Persist theme preference in localStorage",
+        "Test theme switching works correctly"
+      ],
+      "completion_criteria": "Theme switching works and persists across sessions"
+    },
+    {
+      "id": "app-header",
+      "title": "Create app header component",
+      "description": "Build main navigation and header",
+      "tasks": [
+        "Create AppHeader component",
+        "Add app title and navigation",
+        "Include theme toggle button",
+        "Add mobile-responsive design",
+        "Style with TailwindCSS and shadcn/ui",
+        "Test header on different screen sizes"
+      ],
+      "completion_criteria": "Header displays correctly on all screen sizes with theme toggle"
+    },
+    {
+      "id": "tanstack-query",
+      "title": "Set up TanStack Query",
+      "description": "Configure data fetching and caching",
+      "tasks": [
+        "Install TanStack Query v5",
+        "Create queryClient configuration",
+        "Set up QueryClient provider in App.tsx",
+        "Configure default query options",
+        "Add React Query DevTools for development"
+      ],
+      "completion_criteria": "TanStack Query is configured and ready for data fetching"
+    }
+  ],
+  "test_strategy": "Component tests for theme switching, routing, and basic UI components",
+  "estimated_time": "3-4 hours"
+}

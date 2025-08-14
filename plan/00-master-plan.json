@@ -1,0 +1,166 @@
+{
+  "project": "TubeTrack",
+  "description": "YouTube learning progress tracker with playlist import, video watching, note-taking, and analytics",
+  "total_estimated_time": "40-50 hours",
+  "phases": [
+    {
+      "id": "01-project-setup",
+      "title": "Project Setup & Infrastructure",
+      "file": "01-project-setup.json",
+      "estimated_time": "2-3 hours",
+      "dependencies": [],
+      "key_deliverables": [
+        "Monorepo structure with TypeScript",
+        "Development tooling (ESLint, Prettier)",
+        "Environment configuration"
+      ]
+    },
+    {
+      "id": "02-shared-schemas",
+      "title": "Shared Types & Schemas",
+      "file": "02-shared-schemas.json",
+      "estimated_time": "1-2 hours",
+      "dependencies": ["01-project-setup"],
+      "key_deliverables": [
+        "Zod schemas for all data types",
+        "TypeScript types exported",
+        "API request/response contracts"
+      ]
+    },
+    {
+      "id": "03-server-implementation",
+      "title": "Server Implementation",
+      "file": "03-server-implementation.json",
+      "estimated_time": "3-4 hours",
+      "dependencies": ["02-shared-schemas"],
+      "key_deliverables": [
+        "Express server with security middleware",
+        "YouTube API proxy with rate limiting",
+        "Health check and error handling"
+      ]
+    },
+    {
+      "id": "04-client-foundation",
+      "title": "Client Foundation",
+      "file": "04-client-foundation.json",
+      "estimated_time": "3-4 hours",
+      "dependencies": ["02-shared-schemas"],
+      "key_deliverables": [
+        "React app with Vite and TailwindCSS",
+        "shadcn/ui component library",
+        "Routing and theme system"
+      ]
+    },
+    {
+      "id": "05-playlist-management",
+      "title": "Playlist Management",
+      "file": "05-playlist-management.json",
+      "estimated_time": "4-5 hours",
+      "dependencies": ["03-server-implementation", "04-client-foundation"],
+      "key_deliverables": [
+        "Local storage with migrations",
+        "Playlist import with progress",
+        "YouTube API client integration"
+      ]
+    },
+    {
+      "id": "06-video-lists",
+      "title": "Video Lists & Search",
+      "file": "06-video-lists.json",
+      "estimated_time": "4-5 hours",
+      "dependencies": ["05-playlist-management"],
+      "key_deliverables": ["Collapsible video lists", "Search and filtering", "Progress indicators"]
+    },
+    {
+      "id": "07-video-player",
+      "title": "Video Player & Progress Tracking",
+      "file": "07-video-player.json",
+      "estimated_time": "6-7 hours",
+      "dependencies": ["06-video-lists"],
+      "key_deliverables": [
+        "YouTube IFrame API integration",
+        "Progress tracking system",
+        "Keyboard shortcuts and controls"
+      ]
+    },
+    {
+      "id": "08-notes-system",
+      "title": "Markdown Notes System",
+      "file": "08-notes-system.json",
+      "estimated_time": "5-6 hours",
+      "dependencies": ["07-video-player"],
+      "key_deliverables": [
+        "Markdown editor with preview",
+        "Timestamp insertion and seeking",
+        "Autosave and tag extraction"
+      ]
+    },
+    {
+      "id": "09-analytics-dashboard",
+      "title": "Analytics Dashboard",
+      "file": "09-analytics-dashboard.json",
+      "estimated_time": "4-5 hours",
+      "dependencies": ["08-notes-system"],
+      "key_deliverables": [
+        "Metrics calculation and display",
+        "Progress visualization charts",
+        "Mobile-optimized dashboard"
+      ]
+    },
+    {
+      "id": "10-testing-ci",
+      "title": "Testing & CI/CD",
+      "file": "10-testing-ci.json",
+      "estimated_time": "6-8 hours",
+      "dependencies": ["09-analytics-dashboard"],
+      "key_deliverables": [
+        "Comprehensive test suite",
+        "GitHub Actions CI pipeline",
+        "E2E testing strategy"
+      ]
+    },
+    {
+      "id": "11-documentation-deployment",
+      "title": "Documentation & Deployment",
+      "file": "11-documentation-deployment.json",
+      "estimated_time": "4-5 hours",
+      "dependencies": ["10-testing-ci"],
+      "key_deliverables": [
+        "Complete README and documentation",
+        "User help system",
+        "Deployment guides"
+      ]
+    }
+  ],
+  "critical_path": [
+    "Project Setup → Shared Schemas → Server + Client Foundation → Playlist Management → Video Lists → Video Player → Notes → Analytics → Testing → Documentation"
+  ],
+  "parallel_opportunities": [
+    "Server Implementation can run parallel with Client Foundation after Shared Schemas",
+    "Testing can be written incrementally alongside each phase",
+    "Documentation can be started early and updated throughout"
+  ],
+  "acceptance_criteria": [
+    "Import large playlist (200+ videos) with paginated fetching",
+    "Watch video with progress tracking and resume functionality",
+    "Take notes with timestamps that seek video when clicked",
+    "View analytics with watch time, completion rate, and streaks",
+    "Server protects API key and implements rate limiting",
+    "Mobile-friendly responsive design with dark/light themes",
+    "Type-safe client/server communication with validation"
+  ],
+  "tech_stack": {
+    "frontend": [
+      "React 18",
+      "Vite 5",
+      "TypeScript 5.4+",
+      "TailwindCSS 3.4+",
+      "shadcn/ui",
+      "TanStack Query v5"
+    ],
+    "backend": ["Node.js 20+", "Express 4", "TypeScript"],
+    "shared": ["Zod", "TypeScript"],
+    "testing": ["Vitest", "React Testing Library", "Supertest"],
+    "tools": ["ESLint", "Prettier", "GitHub Actions"]
+  }
+}

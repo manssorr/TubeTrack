@@ -1,0 +1,86 @@
+{
+  "phase": "05-playlist-management",
+  "title": "Playlist Management",
+  "description": "Implement playlist import, local storage, and state management",
+  "dependencies": ["03-server-implementation", "04-client-foundation"],
+  "todos": [
+    {
+      "id": "local-storage-system",
+      "title": "Implement local storage with migrations",
+      "description": "Create versioned local storage system for app state",
+      "tasks": [
+        "Create lib/storage.ts with typed localStorage access",
+        "Implement schema versioning and migrations",
+        "Add getState(), setState(), update() helpers",
+        "Create useLocalStorage hook",
+        "Add debounced persistence with withPersist()",
+        "Handle schema validation errors gracefully",
+        "Test migration system with version changes"
+      ],
+      "completion_criteria": "Local storage works with proper versioning and error handling"
+    },
+    {
+      "id": "youtube-client",
+      "title": "Create YouTube API client",
+      "description": "Build client-side API wrapper for server proxy",
+      "tasks": [
+        "Create lib/youtube.ts with API functions",
+        "Implement usePlaylistItems infinite query hook",
+        "Create useVideo query hook",
+        "Add proper error handling and validation",
+        "Configure query caching and refetch policies",
+        "Add helper function to extract playlist ID from URLs",
+        "Test API calls with mock server responses"
+      ],
+      "completion_criteria": "YouTube API client works with proper caching and error handling"
+    },
+    {
+      "id": "playlist-manager-component",
+      "title": "Build PlaylistManager component",
+      "description": "Create UI for importing and managing playlists",
+      "tasks": [
+        "Create PlaylistManager component",
+        "Add playlist URL/ID input with validation",
+        "Implement import button with loading states",
+        "Create playlist list with delete functionality",
+        "Add import progress indicator",
+        "Show playlist metadata (title, item count)",
+        "Add confirmation dialog for playlist deletion",
+        "Handle import errors with user feedback"
+      ],
+      "completion_criteria": "Users can import playlists and see them listed with proper feedback"
+    },
+    {
+      "id": "playlist-import-flow",
+      "title": "Implement playlist import logic",
+      "description": "Build the complete playlist import process",
+      "tasks": [
+        "Create import mutation with progress tracking",
+        "Implement paginated fetching of all playlist items",
+        "Normalize playlist and video data for storage",
+        "Update local state with imported data",
+        "Show progress during long imports",
+        "Handle partial failures and retries",
+        "Add toast notifications for import status",
+        "Test with large playlists (200+ videos)"
+      ],
+      "completion_criteria": "Large playlists import completely with progress feedback"
+    },
+    {
+      "id": "playlist-state-management",
+      "title": "Implement playlist state management",
+      "description": "Create hooks and utilities for playlist data",
+      "tasks": [
+        "Create useAppState hook for global state",
+        "Implement playlist CRUD operations",
+        "Add video lookup and filtering utilities",
+        "Create playlist statistics calculations",
+        "Add data validation and error boundaries",
+        "Implement optimistic updates where appropriate"
+      ],
+      "completion_criteria": "Playlist data is properly managed with efficient updates"
+    }
+  ],
+  "test_strategy": "Test playlist import flow, local storage migrations, and error handling scenarios",
+  "estimated_time": "4-5 hours"
+}

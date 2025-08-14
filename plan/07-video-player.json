@@ -1,0 +1,120 @@
+{
+  "phase": "07-video-player",
+  "title": "Video Player & Progress Tracking",
+  "description": "Implement YouTube player with progress tracking, controls, and keyboard shortcuts",
+  "dependencies": ["06-video-lists"],
+  "todos": [
+    {
+      "id": "youtube-player-hook",
+      "title": "Create useYouTubePlayer hook",
+      "description": "Build React hook for YouTube IFrame API integration",
+      "tasks": [
+        "Create useYouTubePlayer hook with ref management",
+        "Load YouTube IFrame API script dynamically",
+        "Handle player ready state and initialization",
+        "Implement play, pause, seek, setRate API methods",
+        "Track player state (playing, paused, ended)",
+        "Get currentTime and duration properties",
+        "Handle player errors gracefully",
+        "Test hook with different video IDs"
+      ],
+      "completion_criteria": "YouTube player hook provides reliable API interface"
+    },
+    {
+      "id": "progress-tracking-hook",
+      "title": "Implement useProgressTracker hook",
+      "description": "Track and persist video watch progress",
+      "tasks": [
+        "Create useProgressTracker hook",
+        "Poll currentTime every 1s when playing",
+        "Accumulate unique watched seconds accurately",
+        "Calculate completion percentage (watched/duration)",
+        "Save lastPositionSeconds every 5s",
+        "Mark complete at 90% watched or video end",
+        "Persist progress data to localStorage",
+        "Handle progress updates efficiently"
+      ],
+      "completion_criteria": "Progress tracking works accurately and persists data"
+    },
+    {
+      "id": "video-player-component",
+      "title": "Build VideoPlayer component",
+      "description": "Create main video player component",
+      "tasks": [
+        "Create VideoPlayer component with responsive 16:9 aspect ratio",
+        "Integrate useYouTubePlayer hook",
+        "Add loading states and error handling",
+        "Show video title and basic info",
+        "Remember last position and resume playback",
+        "Handle video ID changes properly",
+        "Add player ready and error states",
+        "Style container with proper responsive design"
+      ],
+      "completion_criteria": "Video player loads and plays videos with proper error handling"
+    },
+    {
+      "id": "video-controls",
+      "title": "Create VideoControlPanel",
+      "description": "Add custom controls for video playback",
+      "tasks": [
+        "Create VideoControlPanel component",
+        "Add play/pause button with state sync",
+        "Implement seek buttons (±5s, ±10s)",
+        "Add playback rate selector (0.25x to 2x)",
+        "Create progress scrubber/seek bar",
+        "Add next/previous video navigation",
+        "Show current time and duration",
+        "Style controls with hover effects"
+      ],
+      "completion_criteria": "Video controls provide full playback management"
+    },
+    {
+      "id": "keyboard-shortcuts",
+      "title": "Implement keyboard shortcuts",
+      "description": "Add keyboard controls for video playback",
+      "tasks": [
+        "Create keyboard shortcut system",
+        "Add spacebar for play/pause",
+        "Implement arrow keys for seek (left/right ±5s)",
+        "Add J/K/L keys for seek and play/pause",
+        "Implement number keys for percentage seek",
+        "Add comma/period for frame stepping",
+        "Create shortcut help overlay",
+        "Handle focus and event bubbling properly"
+      ],
+      "completion_criteria": "Keyboard shortcuts work reliably without conflicts"
+    },
+    {
+      "id": "player-modes",
+      "title": "Implement player display modes",
+      "description": "Add theater, minimal, and default player modes",
+      "tasks": [
+        "Create VideoPlayerModes component",
+        "Implement default, theater, and minimal modes",
+        "Add mode toggle buttons",
+        "Adjust player size and layout per mode",
+        "Persist mode preference in settings",
+        "Handle responsive behavior in each mode",
+        "Test mode switching smooth transitions"
+      ],
+      "completion_criteria": "Player modes work correctly with smooth transitions"
+    },
+    {
+      "id": "player-integration",
+      "title": "Integrate player with video lists",
+      "description": "Connect player to video selection and navigation",
+      "tasks": [
+        "Handle video selection from lists",
+        "Implement auto-advance to next video",
+        "Add playlist context for navigation",
+        "Update video list progress in real-time",
+        "Handle URL routing for direct video links",
+        "Add video metadata display",
+        "Test integration with all list features"
+      ],
+      "completion_criteria": "Player integrates seamlessly with video browsing"
+    }
+  ],
+  "test_strategy": "Test player API integration, progress tracking accuracy, keyboard shortcuts, and mode switching",
+  "estimated_time": "6-7 hours"
+}

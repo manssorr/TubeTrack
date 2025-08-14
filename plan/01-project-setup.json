@@ -1,0 +1,59 @@
+{
+  "phase": "01-project-setup",
+  "title": "Project Setup & Infrastructure",
+  "description": "Bootstrap monorepo with TypeScript, tooling, and development environment",
+  "dependencies": [],
+  "todos": [
+    {
+      "id": "init-monorepo",
+      "title": "Initialize monorepo structure",
+      "description": "Create package.json and workspace configuration",
+      "tasks": [
+        "Create root package.json with workspaces",
+        "Set up pnpm or npm workspace configuration",
+        "Create client/, server/, shared/ directories",
+        "Add .gitignore for Node.js project"
+      ],
+      "completion_criteria": "Monorepo structure exists with proper workspace config"
+    },
+    {
+      "id": "typescript-setup",
+      "title": "Configure TypeScript",
+      "description": "Set up TypeScript for all packages with strict mode",
+      "tasks": [
+        "Create root tsconfig.json with base configuration",
+        "Create tsconfig.json for each package (client, server, shared)",
+        "Configure strict mode and modern target",
+        "Set up path aliases for imports"
+      ],
+      "completion_criteria": "TypeScript compiles without errors across all packages"
+    },
+    {
+      "id": "dev-tooling",
+      "title": "Set up development tooling",
+      "description": "Configure linting, formatting, and development scripts",
+      "tasks": [
+        "Install and configure ESLint with TypeScript rules",
+        "Install and configure Prettier",
+        "Create .eslintrc.json and .prettierrc",
+        "Add dev, build, lint, test scripts to package.json",
+        "Set up pre-commit hooks (optional)"
+      ],
+      "completion_criteria": "Linting and formatting work correctly"
+    },
+    {
+      "id": "env-setup",
+      "title": "Environment configuration",
+      "description": "Create environment files and configuration",
+      "tasks": [
+        "Create .env.example with all required variables",
+        "Add dotenv configuration",
+        "Document environment setup in README",
+        "Create .env for local development"
+      ],
+      "completion_criteria": "Environment variables properly configured"
+    }
+  ],
+  "test_strategy": "Verify TypeScript compilation, linting passes, and scripts run correctly",
+  "estimated_time": "2-3 hours"
+}

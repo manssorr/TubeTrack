@@ -1,0 +1,80 @@
+{
+  "phase": "03-server-implementation",
+  "title": "Server Implementation",
+  "description": "Build Express server with YouTube API proxy, rate limiting, and security",
+  "dependencies": ["02-shared-schemas"],
+  "todos": [
+    {
+      "id": "server-foundation",
+      "title": "Set up Express server foundation",
+      "description": "Create basic Express app with middleware",
+      "tasks": [
+        "Set up server/package.json with dependencies",
+        "Create server/src/index.ts with Express app",
+        "Configure CORS with environment-based origins",
+        "Add Helmet for security headers",
+        "Set up error handling middleware",
+        "Add request logging and timeouts",
+        "Configure JSON parsing and body limits"
+      ],
+      "completion_criteria": "Server starts and handles basic requests with proper security"
+    },
+    {
+      "id": "rate-limiting",
+      "title": "Implement rate limiting",
+      "description": "Add rate limiting to protect YouTube API quota",
+      "tasks": [
+        "Install rate-limiter-flexible",
+        "Configure IP-based rate limiting",
+        "Set up points and duration from environment",
+        "Add rate limit headers to responses",
+        "Create rate limit error responses",
+        "Test rate limiting behavior"
+      ],
+      "completion_criteria": "Rate limiting blocks excessive requests with proper error messages"
+    },
+    {
+      "id": "health-endpoint",
+      "title": "Create health check endpoint",
+      "description": "Simple health check for monitoring",
+      "tasks": [
+        "Create GET /api/health endpoint",
+        "Return basic health status",
+        "Add uptime and version info",
+        "Test endpoint responds correctly"
+      ],
+      "completion_criteria": "Health endpoint returns 200 with status information"
+    },
+    {
+      "id": "youtube-proxy",
+      "title": "Implement YouTube API proxy",
+      "description": "Create endpoints to proxy YouTube Data API safely",
+      "tasks": [
+        "Set up YouTube API client with axios",
+        "Create GET /api/youtube/playlist/:id/items endpoint",
+        "Implement pagination with cursor parameter",
+        "Add response normalization and validation",
+        "Handle YouTube API errors gracefully",
+        "Add request timeout and retry logic",
+        "Create GET /api/youtube/video/:id endpoint",
+        "Never expose API key to client"
+      ],
+      "completion_criteria": "YouTube proxy endpoints work with proper error handling and pagination"
+    },
+    {
+      "id": "server-build",
+      "title": "Set up server build and deployment",
+      "description": "Configure build process and production setup",
+      "tasks": [
+        "Add TypeScript build configuration",
+        "Create build script in package.json",
+        "Set up development server with auto-reload",
+        "Configure production environment",
+        "Add server startup logging"
+      ],
+      "completion_criteria": "Server builds and runs in both development and production modes"
+    }
+  ],
+  "test_strategy": "Unit tests for endpoints, rate limiting, error handling. Integration tests with mocked YouTube API",
+  "estimated_time": "3-4 hours"
+}

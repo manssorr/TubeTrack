@@ -1,0 +1,116 @@
+{
+  "phase": "09-analytics-dashboard",
+  "title": "Analytics Dashboard",
+  "description": "Build analytics dashboard with metrics, charts, and progress visualization",
+  "dependencies": ["08-notes-system"],
+  "todos": [
+    {
+      "id": "analytics-hook",
+      "title": "Create useAnalytics hook",
+      "description": "Build hook to calculate metrics from app state",
+      "tasks": [
+        "Create useAnalytics hook",
+        "Calculate total watched time across all videos",
+        "Compute completion rates per playlist",
+        "Calculate daily/weekly streaks",
+        "Aggregate tag frequency statistics",
+        "Estimate time to complete playlists",
+        "Calculate average playback rate usage",
+        "Add per-playlist detailed metrics"
+      ],
+      "completion_criteria": "Analytics hook provides comprehensive metrics calculations"
+    },
+    {
+      "id": "metrics-cards",
+      "title": "Create metrics display cards",
+      "description": "Build UI cards for key metrics",
+      "tasks": [
+        "Create MetricCard component with shadcn/ui",
+        "Add total watched time card with formatting",
+        "Create completion rate card with percentage",
+        "Add current streak card with day count",
+        "Create active playlists card",
+        "Add notes count and tag metrics",
+        "Style cards consistently with icons",
+        "Make cards responsive for mobile"
+      ],
+      "completion_criteria": "Metrics cards display key information clearly"
+    },
+    {
+      "id": "progress-charts",
+      "title": "Implement progress visualization",
+      "description": "Add charts and visualizations for progress data",
+      "tasks": [
+        "Choose lightweight charting library (recharts or similar)",
+        "Create progress over time chart",
+        "Add daily/weekly watch time visualization",
+        "Create completion progress by playlist",
+        "Add tag usage frequency chart",
+        "Implement playback rate distribution chart",
+        "Style charts consistently with theme",
+        "Handle empty states and loading"
+      ],
+      "completion_criteria": "Charts effectively visualize user progress and patterns"
+    },
+    {
+      "id": "dashboard-layout",
+      "title": "Build AnalyticsDashboard component",
+      "description": "Create main dashboard layout and navigation",
+      "tasks": [
+        "Create AnalyticsDashboard component",
+        "Organize metrics cards in responsive grid",
+        "Add charts section with proper spacing",
+        "Implement collapsible sections",
+        "Add time range filters (week, month, all)",
+        "Create export/share functionality (optional)",
+        "Handle empty states with helpful CTAs"
+      ],
+      "completion_criteria": "Dashboard provides comprehensive overview of user activity"
+    },
+    {
+      "id": "detailed-analytics",
+      "title": "Add detailed analytics views",
+      "description": "Provide deeper insights and breakdowns",
+      "tasks": [
+        "Add per-playlist detailed analytics",
+        "Create video-level progress breakdowns",
+        "Add learning patterns analysis",
+        "Implement goal tracking (optional)",
+        "Add time-based comparisons",
+        "Create most/least watched content insights",
+        "Add learning velocity calculations"
+      ],
+      "completion_criteria": "Detailed analytics provide actionable insights"
+    },
+    {
+      "id": "dashboard-performance",
+      "title": "Optimize dashboard performance",
+      "description": "Ensure fast loading and smooth interactions",
+      "tasks": [
+        "Memoize expensive calculations",
+        "Implement lazy loading for charts",
+        "Add loading states for all metrics",
+        "Optimize data aggregation algorithms",
+        "Test performance with large datasets",
+        "Add error boundaries for chart failures"
+      ],
+      "completion_criteria": "Dashboard loads quickly and handles large datasets"
+    },
+    {
+      "id": "mobile-analytics",
+      "title": "Optimize analytics for mobile",
+      "description": "Ensure dashboard works well on mobile devices",
+      "tasks": [
+        "Test dashboard layout on mobile screens",
+        "Adjust chart sizes for touch interaction",
+        "Stack cards vertically on small screens",
+        "Optimize chart interactions for touch",
+        "Test swipe gestures for chart navigation",
+        "Ensure all metrics are readable on mobile"
+      ],
+      "completion_criteria": "Analytics dashboard is fully functional on mobile"
+    }
+  ],
+  "test_strategy": "Test metric calculations accuracy, chart rendering, and mobile responsiveness",
+  "estimated_time": "4-5 hours"
+}
