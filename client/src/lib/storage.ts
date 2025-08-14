@@ -1,25 +1,22 @@
-import { ProgressData, Playlist, Video } from '@shared/schema';
+import { ProgressData, progressDataSchema, userSettingsSchema } from '@shared/schema';
 
 const STORAGE_KEY = 'youtube_learning_tracker';
 
 // Default progress data
-const defaultProgressData: ProgressData = {
+const defaultProgressData: ProgressData = progressDataSchema.parse({
   playlists: [],
-  settings: {
-    darkMode: false,
-    autoSave: true,
-    autoSaveInterval: 30000,
-  },
-};
+  settings: userSettingsSchema.parse({})
+});
 
 // Load progress data from localStorage
 export function loadProgressData(): ProgressData {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return defaultProgressData;
-    
+
     const parsed = JSON.parse(stored);
-    return { ...defaultProgressData, ...parsed };
+    // Validate and merge with defaults using zod
+    return progressDataSchema.parse({ ...defaultProgressData, ...parsed });
   } catch (error) {
     console.error('Error loading progress data:', error);
     return defaultProgressData;

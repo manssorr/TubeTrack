@@ -20,7 +20,7 @@ export function useYouTubePlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [playerState, setPlayerState] = useState(-1);
-  const timeUpdateIntervalRef = useRef<NodeJS.Timeout>();
+  const timeUpdateIntervalRef = useRef<number | undefined>();
 
   // Initialize YouTube player
   useEffect(() => {
@@ -74,8 +74,8 @@ export function useYouTubePlayer({
   // Start time updates
   const startTimeUpdates = useCallback(() => {
     if (timeUpdateIntervalRef.current) return;
-    
-    timeUpdateIntervalRef.current = setInterval(() => {
+
+    timeUpdateIntervalRef.current = window.setInterval(() => {
       if (playerRef.current && typeof playerRef.current.getCurrentTime === 'function') {
         const time = playerRef.current.getCurrentTime();
         setCurrentTime(time);
@@ -87,7 +87,7 @@ export function useYouTubePlayer({
   // Stop time updates
   const stopTimeUpdates = useCallback(() => {
     if (timeUpdateIntervalRef.current) {
-      clearInterval(timeUpdateIntervalRef.current);
+      window.clearInterval(timeUpdateIntervalRef.current);
       timeUpdateIntervalRef.current = undefined;
     }
   }, []);
