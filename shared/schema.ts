@@ -31,20 +31,32 @@ export const playlistSchema = z.object({
   startDate: z.string(),
   totalActualTime: z.number().default(0), // total seconds spent learning
   currentVideoIndex: z.number().default(0),
+  lastAccessed: z.string().optional(),
+  createdAt: z.string().optional(),
+  isFavorite: z.boolean().default(false),
+  tags: z.array(z.string()).default([]),
+});
+
+// User settings schema
+export const userSettingsSchema = z.object({
+  theme: z.enum(['light', 'dark']).default('light'),
+  darkMode: z.boolean().default(false),
+  autoSave: z.boolean().default(true),
+  autoSaveInterval: z.number().default(30000), // 30 seconds
+  videoPlayerMode: z.enum(['normal', 'theater', 'fullscreen', 'focus']).default('normal'),
+  showKeyboardShortcuts: z.boolean().default(true),
+  autoMarkCompleted: z.boolean().default(false), // Auto-mark video as completed at 90%
 });
 
 // Progress tracking data
 export const progressDataSchema = z.object({
   playlists: z.array(playlistSchema),
-  settings: z.object({
-    darkMode: z.boolean().default(false),
-    autoSave: z.boolean().default(true),
-    autoSaveInterval: z.number().default(30000), // 30 seconds
-  }),
+  settings: userSettingsSchema,
 });
 
 export type Video = z.infer<typeof videoSchema>;
 export type Playlist = z.infer<typeof playlistSchema>;
+export type UserSettings = z.infer<typeof userSettingsSchema>;
 export type ProgressData = z.infer<typeof progressDataSchema>;
 
 export const insertUserSchema = createInsertSchema(users).pick({

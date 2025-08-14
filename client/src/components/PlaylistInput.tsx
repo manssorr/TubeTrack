@@ -160,7 +160,7 @@ export function PlaylistInput({ onPlaylistAdd }: PlaylistInputProps) {
               className="flex-1"
             />
             <Button onClick={handleLoadPlaylist} disabled={isLoading}>
-              <Plus className="w-4 h-4 mr-2" />
+              {!!isLoading && <Plus className="w-4 h-4 mr-2" />}
               {isLoading ? 'Loading...' : 'Load'}
             </Button>
           </div>

@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Bookmark, Clock } from 'lucide-react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { Bookmark, Clock, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useYouTubePlayer } from '@/hooks/useYouTubePlayer';
-import { Video } from '@shared/schema';
+import { VideoPlayerModes } from './VideoPlayerModes';
+import { Video, UserSettings } from '@shared/schema';
 import { formatDuration } from '@/lib/storage';
 import { extractVideoId } from '@/lib/youtube';
 
@@ -13,17 +14,23 @@ interface VideoPlayerProps {
   onProgressUpdate: (currentTime: number, actualTimeSpent: number) => void;
   onMarkCheckpoint: (currentTime: number) => void;
   onInsertTimestamp: (timestamp: string) => void;
+  playerMode?: UserSettings['videoPlayerMode'];
+  onModeChange?: (mode: UserSettings['videoPlayerMode']) => void;
 }
 
 export function VideoPlayer({ 
   video, 
   onProgressUpdate, 
   onMarkCheckpoint,
-  onInsertTimestamp 
+  onInsertTimestamp,
+  playerMode = 'normal',
+  onModeChange
 }: VideoPlayerProps) {
   const [sessionStartTime, setSessionStartTime] = useState<number>(Date.now());
   const [totalSessionTime, setTotalSessionTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const playerContainerRef = useRef<HTMLDivElement>(null);
 
   const videoId = video ? extractVideoId(video.url) : null;
 
@@ -70,16 +77,57 @@ export function VideoPlayer({
     }
   }, [isReady, video, seekTo]);
 
-  // Keyboard shortcuts
+  // Handle fullscreen mode
+  const toggleFullscreen = useCallback(async () => {
+    if (!playerContainerRef.current) return;
+
+    try {
+      if (!document.fullscreenElement) {
+        await playerContainerRef.current.requestFullscreen();
+        setIsFullscreen(true);
+        onModeChange?.('fullscreen');
+      } else {
+        await document.exitFullscreen();
+        setIsFullscreen(false);
+        onModeChange?.('normal');
+      }
+    } catch (error) {
+      console.error('Fullscreen error:', error);
+    }
+  }, [onModeChange]);
+
+  // Handle fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const isCurrentlyFullscreen = !!document.fullscreenElement;
+      setIsFullscreen(isCurrentlyFullscreen);
+      if (!isCurrentlyFullscreen && playerMode === 'fullscreen') {
+        onModeChange?.('normal');
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, [playerMode, onModeChange]);
+
+  // Enhanced keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger when user is typing in input fields
       if (e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement) {
+        return;
+      }
+
+      // Don't trigger if any modifier keys are pressed except for our specific combos
+      const hasModifiers = e.altKey || e.metaKey;
+      if (hasModifiers && !(e.ctrlKey && e.key.toLowerCase() === 't')) {
         return;
       }
 
       switch (e.code) {
         case 'Space':
           e.preventDefault();
+          e.stopPropagation();
           if (isPlaying) {
             pause();
           } else {
@@ -88,23 +136,41 @@ export function VideoPlayer({
           break;
         case 'Enter':
           e.preventDefault();
+          e.stopPropagation();
           if (video) {
             onMarkCheckpoint(getCurrentTime());
           }
           break;
+        case 'KeyF':
+          if (e.ctrlKey) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleFullscreen();
+          }
+          break;
+        case 'Escape':
+          if (isFullscreen) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.exitFullscreen();
+          }
+          break;
       }
 
-      if (e.ctrlKey && e.key === 't') {
+      // Insert timestamp shortcut
+      if (e.ctrlKey && e.key.toLowerCase() === 't') {
         e.preventDefault();
+        e.stopPropagation();
         const time = getCurrentTime();
         const timestamp = formatDuration(time);
         onInsertTimestamp(`[${timestamp}] `);
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isPlaying, play, pause, video, getCurrentTime, onMarkCheckpoint, onInsertTimestamp]);
+    // Use capture phase to ensure we get events before other handlers
+    document.addEventListener('keydown', handleKeyDown, true);
+    return () => document.removeEventListener('keydown', handleKeyDown, true);
+  }, [isPlaying, play, pause, video, getCurrentTime, onMarkCheckpoint, onInsertTimestamp, toggleFullscreen, isFullscreen]);
 
   if (!video) {
     return (
@@ -157,33 +223,89 @@ export function VideoPlayer({
     );
   };
 
-  return (
-    <Card>
-      <CardContent className="p-0">
-        {/* YouTube Player */}
-        <div className="relative">
-          <div className="aspect-video bg-gray-900 rounded-t-lg overflow-hidden">
-            <div ref={containerRef} className="w-full h-full" />
+  // Get container classes based on player mode
+  const getContainerClasses = () => {
+    switch (playerMode) {
+      case 'theater':
+        return 'w-full max-w-none'; // Takes full width of container
+      case 'focus':
+        return 'w-full max-w-4xl mx-auto'; // Centered with max width
+      case 'fullscreen':
+        return 'fixed inset-0 z-50 bg-black'; // Full viewport
+      default:
+        return ''; // Normal card styling
+    }
+  };
+
+  const shouldShowCard = playerMode === 'normal';
+  const shouldShowMinimalUI = playerMode === 'focus' || playerMode === 'fullscreen';
+
+  const playerContent = (
+    <div className={`relative ${getContainerClasses()}`} ref={playerContainerRef}>
+      {/* YouTube Player */}
+      <div className={`relative ${playerMode === 'fullscreen' ? 'h-screen' : 'aspect-video'} bg-gray-900 ${shouldShowCard ? 'rounded-t-lg' : ''} overflow-hidden`}>
+        <div ref={containerRef} className="w-full h-full" />
+        
+        {/* Top Controls Bar (for theater/fullscreen modes) */}
+        {(playerMode === 'theater' || playerMode === 'fullscreen') && (
+          <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/70 to-transparent p-4 opacity-0 hover:opacity-100 transition-opacity">
+            <div className="flex items-center justify-between">
+              <h3 className="text-white font-medium text-lg truncate mr-4">
+                {video.title}
+              </h3>
+              <div className="flex items-center space-x-2">
+                {onModeChange && (
+                  <VideoPlayerModes 
+                    currentMode={playerMode} 
+                    onModeChange={onModeChange}
+                  />
+                )}
+                {playerMode === 'fullscreen' && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => document.exitFullscreen()}
+                    className="text-white hover:bg-white/20"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
-          
-          {/* Progress Overlay */}
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-4">
+        )}
+        
+        {/* Bottom Controls Bar */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-4 opacity-0 hover:opacity-100 transition-opacity">
+          <div className="flex items-center justify-between">
+            {/* Left side - Progress button and time */}
             <div className="flex items-center space-x-4">
               <Button 
                 onClick={() => onMarkCheckpoint(getCurrentTime())}
-                className="bg-green-600 hover:bg-green-700 text-white"
+                size="sm"
+                className="bg-green-600 hover:bg-green-700 text-white font-medium"
               >
                 <Bookmark className="w-4 h-4 mr-2" />
                 Mark Progress
               </Button>
-              <span className="text-white text-sm">
+              <span className="text-white text-sm font-medium">
                 {formatDuration(currentTime)} / {formatDuration(video.duration)}
               </span>
             </div>
+            
+            {/* Right side - Mode controls */}
+            {!shouldShowMinimalUI && onModeChange && (
+              <VideoPlayerModes 
+                currentMode={playerMode} 
+                onModeChange={onModeChange}
+              />
+            )}
           </div>
         </div>
-        
-        {/* Video Info and Controls */}
+      </div>
+      
+      {/* Additional info panel for normal mode */}
+      {shouldShowCard && (
         <div className="p-4">
           <h3 className="font-medium text-gray-900 dark:text-white mb-2">
             {video.title}
@@ -211,10 +333,25 @@ export function VideoPlayer({
               <span>
                 <kbd className="bg-gray-200 dark:bg-gray-600 px-1 rounded">Ctrl+T</kbd> Insert Timestamp
               </span>
+              <span>
+                <kbd className="bg-gray-200 dark:bg-gray-600 px-1 rounded">Ctrl+F</kbd> Fullscreen
+              </span>
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
+
+  if (shouldShowCard) {
+    return (
+      <Card>
+        <CardContent className="p-0">
+          {playerContent}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return playerContent;
 }

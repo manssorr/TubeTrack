@@ -7,9 +7,10 @@ import { useToast } from '@/hooks/use-toast';
 
 interface AppHeaderProps {
   onImport: (data: any) => void;
+  helpTrigger?: React.ReactNode;
 }
 
-export function AppHeader({ onImport }: AppHeaderProps) {
+export function AppHeader({ onImport, helpTrigger }: AppHeaderProps) {
   const { isDark, toggleTheme } = useTheme();
   const { toast } = useToast();
 
@@ -66,6 +67,7 @@ export function AppHeader({ onImport }: AppHeaderProps) {
             <h1 className="text-xl font-semibold text-gray-900 dark:text-white">Learning Tracker</h1>
           </div>
           <div className="flex items-center space-x-4">
+            {helpTrigger}
             <Button variant="ghost" size="sm" onClick={handleImport}>
               <Upload className="w-4 h-4 mr-2" />
               Import
