@@ -1,5 +1,5 @@
 import ReactPlayer from "react-player";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 
 import { useProgressTracker } from "@/hooks/useProgressTracker";
 
@@ -24,15 +24,11 @@ interface VideoPlayerProps {
     // Callback props
     onVideoEnd?: () => void;
     onReady?: () => void;
+    onStart?: () => void;
     onPlay?: () => void;
     onPause?: () => void;
-    onProgress?: (state: {
-        played: number;
-        playedSeconds: number;
-        loaded: number;
-        loadedSeconds: number;
-        duration?: number;
-    }) => void;
+    onTimeUpdate?: (currentTime: number) => void;
+    onDurationChange?: (duration: number) => void;
     onError?: (error: unknown) => void;
 
     // Styling
@@ -55,14 +51,21 @@ export default function VideoPlayer({
     height = "100%",
     onVideoEnd,
     onReady,
+    onStart,
     onPlay,
     onPause,
-    onProgress,
+    onTimeUpdate,
+    onDurationChange,
     onError,
     className = "",
     style = {}
 }: VideoPlayerProps) {
-    const playerRef = useRef<any>(null);
+    const playerRef = useRef<HTMLVideoElement | null>(null);
+
+    const setPlayerRef = useCallback((player: HTMLVideoElement) => {
+        if (!player) return;
+        playerRef.current = player;
+    }, []);
     const hasResumedRef = useRef(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
@@ -85,7 +88,8 @@ export default function VideoPlayer({
             const resumeTime = getResumeTime();
             if (resumeTime > 0 && playerRef.current) {
                 console.log(`Resuming video ${videoId} from ${resumeTime}s`);
-                playerRef.current.seekTo(resumeTime, "seconds");
+                // For ReactPlayer, seek using currentTime
+                playerRef.current.currentTime = resumeTime;
             }
             hasResumedRef.current = true;
         }
@@ -101,27 +105,40 @@ export default function VideoPlayer({
 
     const handleReady = () => {
         setIsReady(true);
-        if (playerRef.current) {
-            const dur = playerRef.current.getDuration();
-            setDuration(dur || 0);
-        }
         onReady?.();
     };
 
-    const handleProgress = (state: {
-        played: number;
-        playedSeconds: number;
-        loaded: number;
-        loadedSeconds: number;
-        duration?: number;
-    }) => {
-        setCurrentTime(state.playedSeconds || 0);
-        // Update duration if we don't have it yet
-        if (!duration && playerRef.current) {
-            const dur = playerRef.current.getDuration();
-            if (dur) setDuration(dur);
+    const handleStart = () => {
+        onStart?.();
+    };
+
+    const handleTimeUpdate = () => {
+        const player = playerRef.current;
+        if (!player) return;
+
+        const currentTime = player.currentTime;
+        setCurrentTime(currentTime);
+        onTimeUpdate?.(currentTime);
+    };
+
+    const handleProgress = () => {
+        const player = playerRef.current;
+        if (!player || !player.buffered?.length) return;
+
+        // This is for loading progress, not playback progress
+        console.log('onProgress - loading');
+    };
+
+    const handleDurationChange = () => {
+        const player = playerRef.current;
+        if (!player) return;
+
+        console.log('onDurationChange', player.duration);
+        const dur = player.duration;
+        if (dur && dur > 0) {
+            setDuration(dur);
+            onDurationChange?.(dur);
         }
-        onProgress?.(state);
     };
 
     const handleError = (error: unknown) => {
@@ -135,7 +152,7 @@ export default function VideoPlayer({
             style={style}
         >
             <ReactPlayer
-                ref={playerRef}
+                ref={setPlayerRef}
                 src={videoUrl}
                 playing={playing ?? false}
                 volume={volume ?? 1}
@@ -148,9 +165,12 @@ export default function VideoPlayer({
                 width={width}
                 height={height}
                 onReady={handleReady}
+                onStart={handleStart}
                 onPlay={onPlay}
                 onPause={onPause}
-                onProgress={handleProgress as any}
+                onTimeUpdate={handleTimeUpdate}
+                onProgress={handleProgress}
+                onDurationChange={handleDurationChange}
                 onEnded={onVideoEnd}
                 onError={handleError}
             />

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
+
 import {
     Dialog,
     DialogContent,
@@ -12,7 +13,6 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-
 import VideoPlayer from "@/components/VideoPlayer";
 import VideoControlPanel from "@/components/VideoControlPanel";
 import { useVideos, useProgress, usePlaylists } from "@/hooks/useLocalStorage";
@@ -264,13 +264,16 @@ export default function VideoPlayerPage() {
                                     onReady={() => {
                                         console.log('Video ready');
                                     }}
+                                    onStart={() => {
+                                        console.log('Video started');
+                                    }}
                                     onPlay={() => setPlaying(true)}
                                     onPause={() => setPlaying(false)}
-                                    onProgress={(state) => {
-                                        setCurrentTime(state.playedSeconds);
-                                        if (state.duration && !duration) {
-                                            setDuration(state.duration);
-                                        }
+                                    onTimeUpdate={(time) => {
+                                        setCurrentTime(time);
+                                    }}
+                                    onDurationChange={(dur) => {
+                                        setDuration(dur);
                                     }}
                                     onVideoEnd={handleVideoEnd}
                                     onError={(error) => {
