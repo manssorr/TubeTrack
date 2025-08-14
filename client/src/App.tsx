@@ -5,6 +5,7 @@ import AppHeader from "./components/AppHeader.tsx";
 import Home from "./pages/Home.tsx";
 import Playlists from "./pages/Playlists.tsx";
 import VideoPlayerPage from "./pages/VideoPlayer.tsx";
+import Analytics from "./pages/Analytics.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 function App() {
@@ -36,7 +37,7 @@ function App() {
                         <>
                             <AppHeader />
                             <main>
-                                <Playlists />
+                                <Analytics />
                             </main>
                         </>
                     } />
