@@ -22,6 +22,7 @@ interface MarkdownNotesPanelProps {
   onJumpToTimestamp: (seconds: number) => void;
   getCurrentTime: () => number;
   isFullWidth?: boolean;
+  onRegisterInsertHandler?: (fn: (prefix: string) => void) => void;
 }
 
 export function MarkdownNotesPanel({ 
@@ -30,7 +31,8 @@ export function MarkdownNotesPanel({
   onInsertTimestamp,
   onJumpToTimestamp,
   getCurrentTime,
-  isFullWidth = false
+  isFullWidth = false,
+  onRegisterInsertHandler,
 }: MarkdownNotesPanelProps) {
   const [notes, setNotes] = useState<Note[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -171,6 +173,15 @@ export function MarkdownNotesPanel({
     );
   }
 
+  useEffect(() => {
+    if (!onRegisterInsertHandler) return;
+    const handler = (prefix: string) => {
+      setNewNoteContent((prev) => `${prefix}${prev}`);
+    };
+    onRegisterInsertHandler(handler);
+    return () => onRegisterInsertHandler(() => {});
+  }, [onRegisterInsertHandler]);
+
   const NotesContent = () => (
     <div className="flex flex-col space-y-4 h-full">
       {/* Add new note - enhanced for full width */}
@@ -297,8 +308,10 @@ export function MarkdownNotesPanel({
                     placeholder="Edit your note... (supports markdown)"
                   />
                 ) : (
-                  <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
-                    {note.content}
+                  <div className="prose prose-sm dark:prose-invert max-w-none">
+                    {/* Simple markdown rendering using a lazy import to avoid bundle bloat */}
+                    {/* @ts-expect-error dynamic import typing */}
+                    {React.createElement(require('react-markdown').default, {}, note.content)}
                   </div>
                 )}
               </div>

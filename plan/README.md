@@ -3,6 +3,7 @@
 This folder contains an actionable, commit-scoped plan to address identified issues, tech debt, and design problems. Each task is designed to be its own commit with clear scope, todos, tests, and acceptance criteria.
 
 ### Guiding principles
+
 - Keep client bundles browser-only (no server/DB code in client).
 - One source of truth for app state; explicit persistence layer.
 - Validate persisted data with schemas and provide migrations.
@@ -10,6 +11,7 @@ This folder contains an actionable, commit-scoped plan to address identified iss
 - Small, reviewable commits; tests accompany changes.
 
 ### Task list (sequence)
+
 1. 01-split-shared-schema: Split shared schemas from server DB schema
 2. 02-server-hardening: Error handling, host binding, logging
 3. 03-tailwind-alignment: Align Tailwind version/plugins and ESM imports
@@ -22,4 +24,3 @@ This folder contains an actionable, commit-scoped plan to address identified iss
 10. 10-dep-trim-and-cleanup: Remove unused deps; tidy configs
 
 See `tasks/*` for details on each.
-

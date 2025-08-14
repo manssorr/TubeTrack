@@ -16,6 +16,12 @@ interface VideoPlayerProps {
   onInsertTimestamp: (timestamp: string) => void;
   playerMode?: UserSettings['videoPlayerMode'];
   onModeChange?: (mode: UserSettings['videoPlayerMode']) => void;
+  onExposeControls?: (controls: {
+    seekTo: (seconds: number) => void;
+    getCurrentTime: () => number;
+    play: () => void;
+    pause: () => void;
+  }) => void;
 }
 
 export function VideoPlayer({ 
@@ -24,7 +30,8 @@ export function VideoPlayer({
   onMarkCheckpoint,
   onInsertTimestamp,
   playerMode = 'normal',
-  onModeChange
+  onModeChange,
+  onExposeControls
 }: VideoPlayerProps) {
   const [sessionStartTime, setSessionStartTime] = useState<number>(Date.now());
   const [totalSessionTime, setTotalSessionTime] = useState(0);
@@ -70,6 +77,13 @@ export function VideoPlayer({
     onStateChange: handleStateChange,
   });
 
+  // Expose controls to parent (Home) so other panels can seek/inspect time
+  useEffect(() => {
+    if (onExposeControls) {
+      onExposeControls({ seekTo, getCurrentTime, play, pause });
+    }
+  }, [onExposeControls, seekTo, getCurrentTime, play, pause]);
+
   // Seek to last position when video loads
   useEffect(() => {
     if (isReady && video && video.lastPosition > 0) {
@@ -110,24 +124,39 @@ export function VideoPlayer({
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, [playerMode, onModeChange]);
 
-  // Enhanced keyboard shortcuts
+  // Enhanced keyboard shortcuts (scoped and input-safe)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't trigger when user is typing in input fields
-      if (e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement) {
-        return;
-      }
+      const target = e.target as HTMLElement | null;
+      const active = document.activeElement as HTMLElement | null;
+      const isEditable = (el: HTMLElement | null) => {
+        if (!el) return false;
+        return (
+          el instanceof HTMLInputElement ||
+          el instanceof HTMLTextAreaElement ||
+          el.isContentEditable ||
+          el.getAttribute('role') === 'textbox'
+        );
+      };
 
-      // Don't trigger if any modifier keys are pressed except for our specific combos
+      // Ignore when typing anywhere editable
+      if (isEditable(target) || isEditable(active)) return;
+
+      // Only react if event occurs within the player container (except Ctrl+T)
+      const path = (e.composedPath && e.composedPath()) || [];
+      const insidePlayer = playerContainerRef.current ? path.includes(playerContainerRef.current) : true;
+
+      // Allow Ctrl+T globally for timestamp insertion
+      const isTimestampCombo = e.ctrlKey && e.key.toLowerCase() === 't';
+      if (!insidePlayer && !isTimestampCombo) return;
+
+      // Skip unrelated modifier combos
       const hasModifiers = e.altKey || e.metaKey;
-      if (hasModifiers && !(e.ctrlKey && e.key.toLowerCase() === 't')) {
-        return;
-      }
+      if (hasModifiers && !isTimestampCombo) return;
 
       switch (e.code) {
         case 'Space':
           e.preventDefault();
-          e.stopPropagation();
           if (isPlaying) {
             pause();
           } else {
@@ -135,41 +164,37 @@ export function VideoPlayer({
           }
           break;
         case 'Enter':
-          e.preventDefault();
-          e.stopPropagation();
           if (video) {
+            e.preventDefault();
             onMarkCheckpoint(getCurrentTime());
           }
           break;
         case 'KeyF':
           if (e.ctrlKey) {
             e.preventDefault();
-            e.stopPropagation();
             toggleFullscreen();
           }
           break;
         case 'Escape':
           if (isFullscreen) {
             e.preventDefault();
-            e.stopPropagation();
             document.exitFullscreen();
           }
           break;
+        default:
+          break;
       }
 
-      // Insert timestamp shortcut
-      if (e.ctrlKey && e.key.toLowerCase() === 't') {
+      if (isTimestampCombo) {
         e.preventDefault();
-        e.stopPropagation();
         const time = getCurrentTime();
         const timestamp = formatDuration(time);
         onInsertTimestamp(`[${timestamp}] `);
       }
     };
 
-    // Use capture phase to ensure we get events before other handlers
-    document.addEventListener('keydown', handleKeyDown, true);
-    return () => document.removeEventListener('keydown', handleKeyDown, true);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isPlaying, play, pause, video, getCurrentTime, onMarkCheckpoint, onInsertTimestamp, toggleFullscreen, isFullscreen]);
 
   if (!video) {

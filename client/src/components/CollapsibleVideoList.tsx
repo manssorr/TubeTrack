@@ -24,7 +24,7 @@ export function CollapsibleVideoList({
 }: CollapsibleVideoListProps) {
   if (!playlist) {
     return (
-      <Card className={`transition-all duration-300 ${isCollapsed ? 'w-12' : 'w-full'}`}>
+      <Card className={`transition-all duration-300 ${isCollapsed ? 'w-12' : 'w-full'} h-full flex flex-col`}>
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             {!isCollapsed && <CardTitle className="text-sm">Playlist Videos</CardTitle>}
@@ -39,7 +39,7 @@ export function CollapsibleVideoList({
           </div>
         </CardHeader>
         {!isCollapsed && (
-          <CardContent>
+          <CardContent className="flex-1 min-h-0">
             <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-8">
               No playlist loaded
             </p>
@@ -62,7 +62,7 @@ export function CollapsibleVideoList({
   };
 
   return (
-    <Card className={`transition-all duration-300 ${isCollapsed ? 'w-12' : 'w-full'}`}>
+    <Card className={`transition-all duration-300 ${isCollapsed ? 'w-12' : 'w-full'} h-full flex flex-col`}>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           {!isCollapsed && <CardTitle className="text-sm">Playlist Videos</CardTitle>}
@@ -78,8 +78,8 @@ export function CollapsibleVideoList({
       </CardHeader>
 
       {!isCollapsed && (
-        <CardContent>
-          <ScrollArea className="h-96">
+        <CardContent className="flex-1 min-h-0">
+          <ScrollArea className="h-full">
             <div className="space-y-3">
               {playlist.videos.map((video, index) => {
                 const progress = getVideoProgress(video);

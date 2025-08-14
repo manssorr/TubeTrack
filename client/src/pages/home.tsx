@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { AppHeader } from '@/components/AppHeader';
 import { PlaylistInput } from '@/components/PlaylistInput';
 import { VideoList } from '@/components/VideoList';
@@ -139,24 +139,32 @@ export default function Home() {
 
   // Current time ref to share between video player and notes
   const [currentVideoTime, setCurrentVideoTime] = useState(0);
-  const [videoPlayerRef, setVideoPlayerRef] = useState<any>(null);
+  const [playerControls, setPlayerControls] = useState<{
+    seekTo: (s: number) => void;
+    getCurrentTime: () => number;
+    play: () => void;
+    pause: () => void;
+  } | null>(null);
   const [isVideoListCollapsed, setIsVideoListCollapsed] = useState(false);
+  const notesInsertHandlerRef = useRef<null | ((s: string) => void)>(null);
 
   // Handle timestamp insertion (for keyboard shortcut)
-  const handleInsertTimestamp = useCallback((timestamp: string) => {
-    console.log('Insert timestamp:', timestamp);
+  const handleInsertTimestamp = useCallback((prefix: string) => {
+    // Route timestamp insertion to notes panel input if registered
+    notesInsertHandlerRef.current?.(prefix);
   }, []);
 
   // Handle jumping to timestamp
   const handleJumpToTimestamp = useCallback((seconds: number) => {
-    console.log('Jump to timestamp:', seconds);
-    // This will be handled by the VideoPlayer component through the YouTube API
-  }, []);
+    playerControls?.seekTo(seconds);
+  }, [playerControls]);
 
   // Get current video time
   const getCurrentVideoTime = useCallback(() => {
+    // Prefer live time from player if available
+    if (playerControls) return playerControls.getCurrentTime();
     return currentVideoTime;
-  }, [currentVideoTime]);
+  }, [playerControls, currentVideoTime]);
 
   return (
     <ThemeProvider>
@@ -217,6 +225,7 @@ export default function Home() {
                         onInsertTimestamp={handleInsertTimestamp}
                         playerMode={userSettings.videoPlayerMode}
                         onModeChange={handlePlayerModeChange}
+                        onExposeControls={setPlayerControls}
                       />
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <VideoList
@@ -224,12 +233,13 @@ export default function Home() {
                           currentVideoIndex={currentPlaylist.currentVideoIndex}
                           onVideoSelect={handleVideoSelect}
                         />
-                        <MarkdownNotesPanel
+                          <MarkdownNotesPanel
                           video={currentVideo}
                           onNotesChange={handleNotesChange}
                           onInsertTimestamp={handleInsertTimestamp}
                           onJumpToTimestamp={handleJumpToTimestamp}
-                          getCurrentTime={getCurrentVideoTime}
+                            getCurrentTime={getCurrentVideoTime}
+                            onRegisterInsertHandler={(fn) => { notesInsertHandlerRef.current = fn; }}
                         />
                       </div>
                     </div>
@@ -245,6 +255,7 @@ export default function Home() {
                           onInsertTimestamp={handleInsertTimestamp}
                           playerMode={userSettings.videoPlayerMode}
                           onModeChange={handlePlayerModeChange}
+                          onExposeControls={setPlayerControls}
                         />
                       </div>
                       
@@ -275,6 +286,7 @@ export default function Home() {
                             onJumpToTimestamp={handleJumpToTimestamp}
                             getCurrentTime={getCurrentVideoTime}
                             isFullWidth={true}
+                            onRegisterInsertHandler={(fn) => { notesInsertHandlerRef.current = fn; }}
                           />
                         </div>
                       </div>
@@ -283,7 +295,7 @@ export default function Home() {
                     // Standard layout for normal mode
                     <div className="flex gap-6">
                       {/* Collapsible Video List - Fixed width when visible, zero when collapsed */}
-                      <div className={isVideoListCollapsed ? "w-0 overflow-hidden" : "w-80 flex-shrink-0"}>
+                      <div className={isVideoListCollapsed ? "w-0 overflow-hidden" : "w-96 flex-shrink-0"}>
                         <CollapsibleVideoList
                           playlist={currentPlaylist}
                           currentVideoIndex={currentPlaylist.currentVideoIndex}
@@ -297,13 +309,14 @@ export default function Home() {
                       <div className="flex-1 min-w-0 space-y-6">
                         {/* Video Player */}
                         <div className="w-full">
-                          <VideoPlayer
+                        <VideoPlayer
                             video={currentVideo}
                             onProgressUpdate={handleProgressUpdate}
                             onMarkCheckpoint={handleMarkCheckpoint}
                             onInsertTimestamp={handleInsertTimestamp}
                             playerMode={userSettings.videoPlayerMode}
                             onModeChange={handlePlayerModeChange}
+                            onExposeControls={setPlayerControls}
                           />
                         </div>
                         
@@ -323,6 +336,7 @@ export default function Home() {
                           onJumpToTimestamp={handleJumpToTimestamp}
                           getCurrentTime={getCurrentVideoTime}
                           isFullWidth={true}
+                          onRegisterInsertHandler={(fn) => { notesInsertHandlerRef.current = fn; }}
                         />
                       </div>
                       

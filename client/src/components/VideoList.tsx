@@ -45,8 +45,8 @@ export function VideoList({ playlist, currentVideoIndex, onVideoSelect }: VideoL
       <CardHeader>
         <CardTitle>Playlist Videos</CardTitle>
       </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-96">
+      <CardContent className="h-full">
+        <ScrollArea className="h-full">
           <div className="space-y-3">
             {playlist.videos.map((video, index) => {
               const progress = getVideoProgress(video);
