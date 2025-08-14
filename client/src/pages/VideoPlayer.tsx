@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, SkipBack, SkipForward, List, Keyboard } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
@@ -30,6 +30,9 @@ export default function VideoPlayerPage() {
     const [playbackRate, setPlaybackRate] = useState(1);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
+    
+    // Seek function reference
+    const seekFunctionRef = useRef<((seconds: number) => void) | null>(null);
 
     const { videos } = useVideos();
     const { getVideoProgress } = useProgress();
@@ -39,8 +42,12 @@ export default function VideoPlayerPage() {
     const handlePlayPause = () => setPlaying(!playing);
 
     const handleSeek = (seconds: number) => {
+        // Update UI immediately for responsive feel
         setCurrentTime(seconds);
-        // Note: Actual seeking is handled by the VideoPlayer component via its ref
+        // Call actual seek function if available
+        if (seekFunctionRef.current) {
+            seekFunctionRef.current(seconds);
+        }
     };
 
     const handleSeekRelative = (delta: number) => {
@@ -274,6 +281,9 @@ export default function VideoPlayerPage() {
                                     }}
                                     onDurationChange={(dur) => {
                                         setDuration(dur);
+                                    }}
+                                    onSeek={(seekFn) => {
+                                        seekFunctionRef.current = seekFn;
                                     }}
                                     onVideoEnd={handleVideoEnd}
                                     onError={(error) => {

@@ -29,6 +29,7 @@ interface VideoPlayerProps {
     onPause?: () => void;
     onTimeUpdate?: (currentTime: number) => void;
     onDurationChange?: (duration: number) => void;
+    onSeek?: (seekFunction: (seconds: number) => void) => void;
     onError?: (error: unknown) => void;
 
     // Styling
@@ -56,6 +57,7 @@ export default function VideoPlayer({
     onPause,
     onTimeUpdate,
     onDurationChange,
+    onSeek,
     onError,
     className = "",
     style = {}
@@ -82,18 +84,34 @@ export default function VideoPlayer({
         isReady,
     });
 
+    // Expose seek function to parent component
+    const seekTo = useCallback((seconds: number) => {
+        if (playerRef.current && seconds >= 0) {
+            console.log('Seeking to:', seconds);
+            playerRef.current.currentTime = seconds;
+            setCurrentTime(seconds);
+        }
+    }, []);
+
+    // Call onSeek when seek function is available
+    useEffect(() => {
+        if (onSeek && isReady) {
+            onSeek(seekTo);
+        }
+    }, [onSeek, seekTo, isReady]);
+
     // Auto-resume from last position
     useEffect(() => {
         if (isReady && resumeFromLastPosition && !hasResumedRef.current && duration > 0) {
             const resumeTime = getResumeTime();
-            if (resumeTime > 0 && playerRef.current) {
+            if (resumeTime > 0) {
                 console.log(`Resuming video ${videoId} from ${resumeTime}s`);
-                // For ReactPlayer, seek using currentTime
-                playerRef.current.currentTime = resumeTime;
+                // Use the seekTo function for consistency
+                seekTo(resumeTime);
             }
             hasResumedRef.current = true;
         }
-    }, [isReady, resumeFromLastPosition, getResumeTime, videoId, duration]);
+    }, [isReady, resumeFromLastPosition, getResumeTime, videoId, duration, seekTo]);
 
     // Reset resume flag when video changes
     useEffect(() => {
