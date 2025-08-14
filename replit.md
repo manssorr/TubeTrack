@@ -8,6 +8,17 @@ This is a comprehensive web application designed to track learning progress thro
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+### Layout and UI Improvements (Aug 14, 2025)
+- **Enhanced Theater Mode**: Now provides true full-width viewing with notes displayed below the video player
+- **Collapsible Video List**: Left panel can be collapsed to zero width, giving video player maximum space
+- **Separated Control Panel**: Mark Progress button moved to dedicated control panel below video player, no longer overlaps progress bar
+- **Enhanced Notes System**: Converted to individual timestamped note items with markdown support and full-screen editing capability
+- **Fixed Dark Mode**: Improved tab visibility and contrast in dark theme
+- **Focus Mode**: Added distraction-free viewing mode with minimal UI elements
+- **Responsive Layout**: Implemented flexible layout system that adapts based on viewing mode and panel states
+
 ## System Architecture
 
 ### Frontend Architecture
