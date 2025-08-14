@@ -166,7 +166,11 @@ export default function Home() {
           helpTrigger={<HelpWiki />}
         />
         
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className={`${
+          userSettings.videoPlayerMode === 'theater' 
+            ? 'max-w-full mx-auto px-2 sm:px-4 lg:px-6' 
+            : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'
+        } py-6`}>
           <Tabs defaultValue="playlists" className="space-y-6">
             <TabsList className="grid w-full grid-cols-3 bg-gray-100 dark:bg-gray-700">
               <TabsTrigger value="playlists" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 dark:data-[state=active]:bg-gray-800 dark:data-[state=active]:text-white dark:text-gray-300">My Playlists</TabsTrigger>
@@ -229,8 +233,54 @@ export default function Home() {
                         />
                       </div>
                     </div>
+                  ) : userSettings.videoPlayerMode === 'theater' ? (
+                    // Theater Mode - Full Width Layout
+                    <div className="space-y-6">
+                      {/* Full width video player */}
+                      <div className="w-full">
+                        <VideoPlayer
+                          video={currentVideo}
+                          onProgressUpdate={handleProgressUpdate}
+                          onMarkCheckpoint={handleMarkCheckpoint}
+                          onInsertTimestamp={handleInsertTimestamp}
+                          playerMode={userSettings.videoPlayerMode}
+                          onModeChange={handlePlayerModeChange}
+                        />
+                      </div>
+                      
+                      {/* Control panel below video */}
+                      <VideoControlPanel
+                        video={currentVideo}
+                        onMarkCheckpoint={handleMarkCheckpoint}
+                        onInsertTimestamp={handleInsertTimestamp}
+                        getCurrentTime={getCurrentVideoTime}
+                      />
+                      
+                      {/* Side-by-side layout for video list and notes */}
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="lg:col-span-1">
+                          <CollapsibleVideoList
+                            playlist={currentPlaylist}
+                            currentVideoIndex={currentPlaylist.currentVideoIndex}
+                            onVideoSelect={handleVideoSelect}
+                            isCollapsed={false}
+                            onToggleCollapse={setIsVideoListCollapsed}
+                          />
+                        </div>
+                        <div className="lg:col-span-2">
+                          <MarkdownNotesPanel
+                            video={currentVideo}
+                            onNotesChange={handleNotesChange}
+                            onInsertTimestamp={handleInsertTimestamp}
+                            onJumpToTimestamp={handleJumpToTimestamp}
+                            getCurrentTime={getCurrentVideoTime}
+                            isFullWidth={true}
+                          />
+                        </div>
+                      </div>
+                    </div>
                   ) : (
-                    // Standard layout for normal/theater modes
+                    // Standard layout for normal mode
                     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                       {/* Collapsible Video List */}
                       <div className={isVideoListCollapsed ? "w-auto" : "lg:col-span-1"}>
@@ -245,11 +295,7 @@ export default function Home() {
                       
                       {/* Video Player */}
                       <div className={`${
-                        userSettings.videoPlayerMode === 'theater' 
-                          ? 'lg:col-span-3' 
-                          : isVideoListCollapsed 
-                            ? 'lg:col-span-3' 
-                            : 'lg:col-span-2'
+                        isVideoListCollapsed ? 'lg:col-span-3' : 'lg:col-span-2'
                       } space-y-4`}>
                         <VideoPlayer
                           video={currentVideo}
@@ -269,8 +315,8 @@ export default function Home() {
                         />
                       </div>
                       
-                      {/* Notes Panel - hidden in theater mode to give more space */}
-                      {userSettings.videoPlayerMode !== 'theater' && (
+                      {/* Notes Panel */}
+                      {!isVideoListCollapsed && (
                         <div className="lg:col-span-1">
                           <MarkdownNotesPanel
                             video={currentVideo}
@@ -281,20 +327,6 @@ export default function Home() {
                           />
                         </div>
                       )}
-                    </div>
-                  )}
-                  
-                  {/* Notes Panel for Theater Mode (below player with full width) */}
-                  {userSettings.videoPlayerMode === 'theater' && (
-                    <div className="w-full">
-                      <MarkdownNotesPanel
-                        video={currentVideo}
-                        onNotesChange={handleNotesChange}
-                        onInsertTimestamp={handleInsertTimestamp}
-                        onJumpToTimestamp={handleJumpToTimestamp}
-                        getCurrentTime={getCurrentVideoTime}
-                        isFullWidth={true}
-                      />
                     </div>
                   )}
                 </div>

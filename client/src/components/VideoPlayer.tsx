@@ -243,7 +243,11 @@ export function VideoPlayer({
   const playerContent = (
     <div className={`relative ${getContainerClasses()}`} ref={playerContainerRef}>
       {/* YouTube Player */}
-      <div className={`relative ${playerMode === 'fullscreen' ? 'h-screen' : 'aspect-video'} bg-gray-900 ${shouldShowCard ? 'rounded-t-lg' : ''} overflow-hidden`}>
+      <div className={`relative ${
+        playerMode === 'fullscreen' ? 'h-screen' : 
+        playerMode === 'theater' ? 'aspect-video w-full' :
+        'aspect-video'
+      } bg-gray-900 ${shouldShowCard ? 'rounded-t-lg' : ''} overflow-hidden`}>
         <div ref={containerRef} className="w-full h-full" />
         
         {/* Top Controls Bar (for theater/fullscreen modes) */}
@@ -275,33 +279,7 @@ export function VideoPlayer({
           </div>
         )}
         
-        {/* Bottom Controls Bar */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-4 opacity-0 hover:opacity-100 transition-opacity">
-          <div className="flex items-center justify-between">
-            {/* Left side - Progress button and time */}
-            <div className="flex items-center space-x-4">
-              <Button 
-                onClick={() => onMarkCheckpoint(getCurrentTime())}
-                size="sm"
-                className="bg-green-600 hover:bg-green-700 text-white font-medium"
-              >
-                <Bookmark className="w-4 h-4 mr-2" />
-                Mark Progress
-              </Button>
-              <span className="text-white text-sm font-medium">
-                {formatDuration(currentTime)} / {formatDuration(video.duration)}
-              </span>
-            </div>
-            
-            {/* Right side - Mode controls */}
-            {!shouldShowMinimalUI && onModeChange && (
-              <VideoPlayerModes 
-                currentMode={playerMode} 
-                onModeChange={onModeChange}
-              />
-            )}
-          </div>
-        </div>
+        
       </div>
       
       {/* Additional info panel for normal mode */}
