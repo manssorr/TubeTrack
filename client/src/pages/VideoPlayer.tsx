@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, SkipBack, SkipForward, List, Keyboard } from "lucide-react";
+import { ArrowLeft, SkipBack, SkipForward, List, Keyboard, FileText } from "lucide-react";
 import { useState, useRef } from "react";
 
 import { Button } from "../components/ui/button";
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import VideoPlayer from "@/components/VideoPlayer";
 import VideoControlPanel from "@/components/VideoControlPanel";
+import MarkdownNotesPanel from "@/components/MarkdownNotesPanel";
 import { useVideos, useProgress, usePlaylists } from "@/hooks/useLocalStorage";
 import { useVideoKeyboardShortcuts, KeyboardShortcutsHelp } from "@/hooks/useVideoKeyboardShortcuts";
 
@@ -22,6 +23,7 @@ export default function VideoPlayerPage() {
     const { videoId } = useParams<{ videoId: string }>();
     const navigate = useNavigate();
     const [showPlaylist, setShowPlaylist] = useState(false);
+    const [showNotes, setShowNotes] = useState(true);
 
     // Player state
     const [playing, setPlaying] = useState(false);
@@ -240,6 +242,16 @@ export default function VideoPlayerPage() {
                             <Button
                                 variant="ghost"
                                 size="sm"
+                                onClick={() => setShowNotes(!showNotes)}
+                                className="flex items-center gap-2"
+                            >
+                                <FileText className="w-4 h-4" />
+                                Notes
+                            </Button>
+
+                            <Button
+                                variant="ghost"
+                                size="sm"
                                 onClick={() => setShowPlaylist(!showPlaylist)}
                                 className="flex items-center gap-2"
                             >
@@ -252,9 +264,16 @@ export default function VideoPlayerPage() {
             </div>
 
             <div className="container mx-auto px-4 py-6">
-                <div className={`grid gap-6 ${showPlaylist ? 'lg:grid-cols-3' : 'lg:grid-cols-1'}`}>
+                <div className={`grid gap-6 ${showPlaylist && showNotes ? 'xl:grid-cols-4' :
+                    showPlaylist || showNotes ? 'lg:grid-cols-3' :
+                        'lg:grid-cols-1'
+                    }`}>
                     {/* Main Video Player */}
-                    <div className={showPlaylist ? 'lg:col-span-2' : 'lg:col-span-1'}>
+                    <div className={
+                        showPlaylist && showNotes ? 'xl:col-span-2' :
+                            showPlaylist || showNotes ? 'lg:col-span-2' :
+                                'lg:col-span-1'
+                    }>
                         <div className="space-y-4">
                             {/* Video Player */}
                             <div className="aspect-video">
@@ -360,6 +379,18 @@ export default function VideoPlayerPage() {
                             </div>
                         </div>
                     </div>
+
+                    {/* Notes Panel */}
+                    {showNotes && (
+                        <div className="lg:col-span-1">
+                            <MarkdownNotesPanel
+                                videoId={videoId || ''}
+                                currentTime={currentTime}
+                                onTimestampClick={handleSeek}
+                                className="h-[600px]"
+                            />
+                        </div>
+                    )}
 
                     {/* Playlist Sidebar */}
                     {showPlaylist && (
